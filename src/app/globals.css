@@ -1,0 +1,328 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  /* Brand colors — blue is dominant, gold is an accent only */
+  --color-primary: #1f5eff;
+  --color-primary-dark: #1646c9;
+  --color-primary-bright: #4c86ff;
+  --color-primary-light: #eaf0ff;
+
+  /* Brand gradient — matches the blue used on the Markidly logo and social assets */
+  --gradient-brand: linear-gradient(135deg, #4c86ff 0%, #1f5eff 55%, #1440b8 100%);
+  /* Hero background gradient — the site's dark navy treatment, reused
+     across every dark section (Hero, Sound Familiar, Why Markidly, Brand
+     Results, Final CTA) so they read as one visual family. Ends in deep
+     navy rather than pure black to stay off large black sections. */
+  --gradient-hero: linear-gradient(160deg, #1793c6 0%, #0c78b8 45%, #0b1f3a 100%);
+  --color-navy: #0b1f3a;
+  --color-navy-soft: #16294a;
+  --color-gold: #c9a227;
+  --color-gold-soft: #e4d4a3;
+  --color-bg: #f7f9fc;
+  --color-white: #ffffff;
+  --color-ink: #101828;
+  --color-ink-soft: #4b5768;
+  --color-line: #e3e8f0;
+
+  /* Typography — h1 uses Montserrat, h2/h3/h4 and body copy use Poppins */
+  --font-h1: var(--font-montserrat), "Montserrat", ui-sans-serif, sans-serif;
+  --font-heading: var(--font-poppins), "Poppins", ui-sans-serif, sans-serif;
+  --font-body: var(--font-poppins), "Poppins", ui-sans-serif, sans-serif;
+
+  /* Container */
+  --container-page: 1240px;
+
+  /* Easing */
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Marquee — used by the dual-direction brand/category scroller and the
+     generic Marquee primitive (ui/marquee.tsx) */
+  --animate-marquee: marquee var(--duration, 40s) linear infinite;
+  --animate-marquee-reverse: marquee-reverse var(--duration, 40s) linear infinite;
+  --animate-marquee-vertical: marquee-vertical var(--duration, 40s) linear infinite;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+}
+
+@keyframes marquee-reverse {
+  from {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes marquee-vertical {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+  }
+}
+
+/* Case-study slider autoplay progress fill — driven inline via
+   animation-play-state so hover/interaction can pause it precisely. */
+@keyframes case-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Hero background drift — pure CSS, GPU-composited, no JS/WebGL cost. This
+   is what the hero's WebGL-unavailable / low-end-device fallback actually
+   shows (the gradient + grid sit underneath the canvas either way, so on
+   the 3D path it's just a subtle extra touch of life). Kept off the shared
+   .bg-gradient-hero utility deliberately — that class is reused by several
+   other (static) sections and shouldn't start animating along with it. */
+@keyframes hero-gradient-drift {
+  0%,
+  100% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 60%;
+  }
+}
+
+@keyframes hero-grid-drift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 56px 56px;
+  }
+}
+
+@layer base {
+  html {
+    /* No native scroll-behavior: smooth here — Lenis (SmoothScroll.tsx)
+       already animates scroll on every frame, and letting the browser's
+       own smooth-scroll easing run at the same time fights it, producing
+       the stutter/"stuck" feel instead of a smooth scroll. */
+    /* Defense-in-depth: the pinned/scroll-driven hero projects floating
+       elements from 3D space, and its section already clips them with
+       overflow-hidden — this is a second guard at the document level so no
+       future absolutely-positioned element (here or elsewhere) can ever
+       force a horizontal scrollbar. */
+    overflow-x: hidden;
+    @apply font-sans;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    @apply bg-background text-foreground;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-heading);
+    color: var(--color-navy);
+    letter-spacing: -0.02em;
+  }
+
+  h1 {
+    font-family: var(--font-h1);
+  }
+  * {
+    @apply border-border outline-ring/50;
+  }
+}
+
+@layer utilities {
+  .bg-gradient-brand {
+    background-image: var(--gradient-brand);
+  }
+
+  .bg-gradient-hero {
+    background-image: var(--gradient-hero);
+  }
+
+  .text-gradient-brand {
+    background-image: var(--gradient-brand);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  .container-page {
+    width: 100%;
+    max-width: var(--container-page);
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .container-page {
+      padding-inline: 2rem;
+    }
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .animate-hero-gradient {
+    background-size: 180% 180%;
+    animation: hero-gradient-drift 22s ease-in-out infinite;
+  }
+
+  .animate-hero-grid {
+    animation: hero-grid-drift 14s linear infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@theme inline {
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  /* --color-primary / --color-primary-foreground intentionally NOT remapped
+     here — shadcn's default init would point them at the near-black
+     --primary token below, which silently overrides the brand blue
+     (#1f5eff) defined in the @theme block above and breaks every
+     bg-primary/text-primary utility (buttons, badges, checkboxes) across
+     the site. The brand's own --color-primary stays the single source of
+     truth for that utility. */
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900">
+  <defs>
+    <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#0b1f3a" flood-opacity="0.10"/>
+    </filter>
+    <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4c86ff" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#c9a227" stop-opacity="0.5"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#4c86ff" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#4c86ff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="900" fill="#f7f9fc"/>
+  <rect x="90" y="80" width="1020" height="740" rx="40" fill="#ffffff" stroke="#e3e8f0" stroke-width="2" filter="url(#cardShadow)"/>
+  <circle cx="140" cy="145" r="4" fill="#c9a227"/>
+  <text x="156" y="150" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="2.5" fill="#1f5eff">ACTION, REASON, NEXT STEP</text><line x1="220" y1="240" x2="220" y2="620" stroke="#e3e8f0" stroke-width="3"/><circle cx="220" cy="260" r="17" fill="#ffffff" stroke="#1f5eff" stroke-width="3"/><path d="M 213 260 l 5 6 l 10 -12" stroke="#1f5eff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="280" y="246" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" letter-spacing="1.5" fill="#1f5eff">WHAT WE'RE DOING</text><text x="280" y="282" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#0b1f3a">Optimize top campaigns</text><circle cx="220" cy="430" r="17" fill="#ffffff" stroke="#1f5eff" stroke-width="3"/><path d="M 213 430 l 5 6 l 10 -12" stroke="#1f5eff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="280" y="416" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" letter-spacing="1.5" fill="#1f5eff">WHY</text><text x="280" y="452" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#0b1f3a">Reduce wasted spend while protecting revenue</text><circle cx="220" cy="600" r="17" fill="#ffffff" stroke="#1f5eff" stroke-width="3"/><path d="M 213 600 l 5 6 l 10 -12" stroke="#1f5eff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="280" y="586" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" letter-spacing="1.5" fill="#1f5eff">WHAT HAPPENS NEXT</text><text x="280" y="622" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#0b1f3a">Review search-term performance in 7 days</text><text x="600" y="800" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700" letter-spacing="1.5" fill="#1f5eff">NO BLACK-BOX ACCOUNT MANAGEMENT</text>
+</svg>
