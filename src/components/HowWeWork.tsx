@@ -1,224 +1,223 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "motion/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Image from "next/image";
+import Link from "next/link";
+import { motion } from "motion/react";
 import {
-  LineChart,
+  ArrowRight,
+  BarChart3,
+  ListChecks,
   Search,
-  SlidersHorizontal,
+  Settings,
   TrendingUp,
-  Zap,
   type LucideIcon,
 } from "lucide-react";
 import Eyebrow from "./ui/Eyebrow";
-import CTAButton from "./ui/CTAButton";
+import { MeshGradient } from "./ui/mesh-gradient";
 import { EASE_PREMIUM } from "@/lib/motion";
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
-
-// Genuine process sequence — this numbering communicates order, not
-// decoration, so it stays per the redesign brief.
-const STEPS: { n: string; title: string; note: string; icon: LucideIcon }[] = [
+const STEPS: { title: string; description: string; icon: LucideIcon }[] = [
   {
-    n: "01",
     title: "Diagnose",
-    note: "We look across the whole account: advertising, listings, conversion, inventory, pricing, and operations, to understand what's actually happening and where growth is being left on the table, not just the symptom you called us about.",
+    description:
+      "Deep dive into your account, data, and marketplace reality to identify what's really holding growth back.",
     icon: Search,
   },
   {
-    n: "02",
     title: "Prioritize",
-    note: "We don't try to fix everything at once. We start with what's costing you the most, whether that's wasted ad spend, underperforming top sellers, or operational issues putting revenue at risk, and work outward from there.",
-    icon: SlidersHorizontal,
+    description:
+      "Focus on the highest-impact opportunities across advertising, listings, operations, and profitability.",
+    icon: ListChecks,
   },
   {
-    n: "03",
     title: "Execute",
-    note: "The right specialists work on the right problems, from advertising to listings to operations, from one shared plan, so nothing gets fixed in isolation.",
-    icon: Zap,
+    description:
+      "Implement a clear, coordinated plan across all key areas of your Amazon business.",
+    icon: Settings,
   },
   {
-    n: "04",
     title: "Measure & Refine",
-    note: "We track what actually happens once changes go live and tell you what changed and why. An account is never done. It's managed.",
-    icon: LineChart,
+    description:
+      "Track what's working, cut what's not, and continuously optimize for stronger, more profitable performance.",
+    icon: BarChart3,
   },
   {
-    n: "05",
     title: "Scale",
-    note: "Once the account is stable, we increase investment in what's working, methodically, while protecting margin and operational stability. And where it makes sense, we go further than capturing existing demand: we help brands create new demand for their products, not just compete for what's already there.",
+    description:
+      "Once the foundation is strong, we help you scale sustainably with a proven, repeatable growth system.",
     icon: TrendingUp,
   },
 ];
 
-export default function HowWeWork() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start 0.7", "end 0.3"],
-  });
-  const lineScale = useTransform(scrollYProgress, [0, 1], [0, 1]);
-  const dotTop = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
-  const dotOpacity = useTransform(scrollYProgress, [0, 0.02, 0.98, 1], [0, 1, 1, 0]);
-
-  // GSAP ScrollTrigger drives which step reads as "active" while the
-  // section scrolls — a restrained progression, not a scroll-jacked one.
-  useEffect(() => {
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-    if (prefersReducedMotion) return;
-
-    const triggers = stepRefs.current.map((el, i) => {
-      if (!el) return null;
-      return ScrollTrigger.create({
-        trigger: el,
-        start: "center 70%",
-        end: "center 35%",
-        onEnter: () => setActiveIndex(i),
-        onEnterBack: () => setActiveIndex(i),
-      });
-    });
-
-    return () => {
-      triggers.forEach((t) => t?.kill());
-    };
-  }, []);
-
+function ApproachVisual() {
   return (
-    <section
-      id="how-we-work"
-      ref={sectionRef}
-      className="relative overflow-hidden bg-gradient-hero py-24 lg:py-32"
-    >
+    <div className="relative mt-6 w-full max-w-[560px]">
+      <Image
+        src="/images/approach-dashboard.png"
+        alt="Markidly dashboard showing rising Amazon sales performance alongside product inventory"
+        width={735}
+        height={459}
+        className="h-auto w-full"
+        sizes="(min-width: 1024px) 560px, 90vw"
+      />
+    </div>
+  );
+}
+
+export default function HowWeWork() {
+  return (
+    <section id="how-we-work" className="relative overflow-hidden bg-white py-12 md:py-14 lg:py-16">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.05]"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
-          backgroundSize: "64px 64px",
-        }}
-      />
-      <motion.div
+        className="pointer-events-none absolute inset-0 opacity-[0.22] [mask-image:radial-gradient(85%_75%_at_50%_40%,black,transparent)]"
+      >
+        <MeshGradient
+          className="h-full w-full"
+          colors={["#ffffff", "#eaf0ff", "#4c86ff", "#1f5eff"]}
+          speed={0.35}
+          distortion={0.65}
+          swirl={0.4}
+          swirlIterations={6}
+          softness={1}
+          shape="wave"
+          shapeScale={0.8}
+          scale={1.6}
+          rotation={135}
+        />
+      </div>
+      <div
         aria-hidden
-        className="pointer-events-none absolute -left-40 top-1/3 h-[420px] w-[420px] rounded-full bg-gold/10 blur-[120px]"
-        animate={{ opacity: [0.4, 0.75, 0.4] }}
-        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+        className="pointer-events-none absolute -right-24 top-0 h-[320px] w-[320px] rounded-full bg-primary/[0.06] blur-[110px]"
       />
-      <motion.div
+      <div
         aria-hidden
-        className="pointer-events-none absolute -right-40 bottom-0 h-[380px] w-[380px] rounded-full bg-primary-bright/15 blur-[110px]"
-        animate={{ opacity: [0.5, 0.85, 0.5] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+        className="pointer-events-none absolute -bottom-40 left-[-10%] h-[420px] w-[900px] rounded-full bg-primary-light/40 blur-[140px]"
       />
 
       <div className="container-page relative">
-        <div className="mx-auto max-w-2xl text-center">
-          <Eyebrow tone="dark">Our Approach</Eyebrow>
-          <h2 className="font-[family-name:var(--font-heading)] text-[32px] font-extrabold leading-[1.2] tracking-tight text-white sm:text-[40px]">
-            A clear operating system for Amazon growth.
-          </h2>
-          <p className="mt-4 text-[15px] leading-relaxed text-white/60">
-            The problems are different every time. Our approach isn&apos;t.
-          </p>
-        </div>
+        <div className="grid items-start gap-10 sm:gap-12 lg:grid-cols-2 lg:gap-x-12 xl:gap-x-16">
+          {/* LEFT */}
+          <div className="min-w-0">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.6 }}
+              transition={{ duration: 0.6, ease: EASE_PREMIUM }}
+            >
+              <Eyebrow>Our Approach</Eyebrow>
+            </motion.div>
 
-        <div className="relative mx-auto mt-20 max-w-3xl">
-          <div className="absolute left-[19px] top-2 bottom-2 w-px bg-white/15 sm:left-[23px]">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.6 }}
+              transition={{ duration: 0.65, ease: EASE_PREMIUM, delay: 0.05 }}
+              className="font-[family-name:var(--font-heading)] text-[28px] font-extrabold leading-[1.1] tracking-tight text-navy min-[400px]:text-[32px] sm:text-[38px] sm:leading-[1.05] md:text-[44px] lg:text-[50px] lg:leading-[1.05] xl:text-[56px]"
+            >
+              A clear operating system for Amazon growth.
+            </motion.h2>
+
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.6 }}
+              transition={{ duration: 0.6, ease: EASE_PREMIUM, delay: 0.1 }}
+              className="mt-3 max-w-[480px] text-[14px] leading-relaxed text-ink-soft sm:text-[16px] lg:text-[17px]"
+            >
+              The problems are different every time. Our approach isn&apos;t.
+            </motion.p>
+
             <motion.div
-              style={{ scaleY: lineScale }}
-              className="h-full w-full origin-top bg-gradient-to-b from-primary-bright to-gold"
-            />
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.6 }}
+              transition={{ duration: 0.6, ease: EASE_PREMIUM, delay: 0.15 }}
+            >
+              <Link
+                href="#book-audit"
+                className="group mt-5 inline-flex h-[48px] w-full items-center justify-center gap-2 rounded-[12px] bg-primary px-5 text-[13.5px] font-semibold text-white shadow-[0_1px_2px_rgba(11,31,58,0.08),0_16px_32px_-12px_rgba(31,94,255,0.55)] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-primary-dark hover:shadow-[0_1px_2px_rgba(11,31,58,0.08),0_20px_40px_-12px_rgba(31,94,255,0.65)] sm:h-[52px] sm:w-auto sm:justify-start sm:gap-2 sm:px-7 sm:text-[14.5px]"
+              >
+                Book a Free Growth Audit
+                <ArrowRight
+                  aria-hidden
+                  strokeWidth={2.25}
+                  className="h-4 w-4 shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1"
+                />
+              </Link>
+            </motion.div>
+
             <motion.div
-              aria-hidden
-              style={{ top: dotTop, opacity: dotOpacity }}
-              className="absolute left-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold shadow-[0_0_16px_4px_rgba(201,162,39,0.65)]"
-            />
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, ease: EASE_PREMIUM, delay: 0.15 }}
+            >
+              <ApproachVisual />
+            </motion.div>
           </div>
 
-          <div className="flex flex-col gap-6">
+          {/* RIGHT */}
+          <div className="min-w-0 lg:pt-2">
             {STEPS.map((step, i) => {
-              const isActive = activeIndex === i;
               const Icon = step.icon;
               return (
                 <motion.div
-                  key={step.n}
-                  ref={(el) => {
-                    stepRefs.current[i] = el;
-                  }}
-                  initial={{ opacity: 0, x: -16 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, amount: 0.6 }}
-                  transition={{ duration: 0.55, ease: EASE_PREMIUM, delay: i * 0.04 }}
-                  className="relative flex items-start gap-6 pl-1 sm:gap-8"
+                  key={step.title}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.4 }}
+                  transition={{ duration: 0.5, ease: EASE_PREMIUM, delay: i * 0.08 }}
+                  className="group grid grid-cols-[16px_1fr] sm:grid-cols-[24px_1fr]"
                 >
-                  <motion.span
-                    animate={{ scale: isActive ? 1.1 : 1 }}
-                    transition={{ duration: 0.4, ease: EASE_PREMIUM }}
-                    className={`relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 backdrop-blur-sm transition-all duration-500 sm:h-12 sm:w-12 ${
-                      isActive
-                        ? "border-gold bg-gold/15 text-gold shadow-[0_0_20px_2px_rgba(201,162,39,0.4)]"
-                        : "border-white/25 bg-white/10 text-white"
-                    }`}
-                  >
-                    <Icon className="h-[18px] w-[18px] sm:h-5 sm:w-5" strokeWidth={2} />
-                  </motion.span>
+                  <div className="relative flex items-center justify-center">
+                    <span
+                      aria-hidden
+                      className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-primary-light"
+                    />
+                    <span
+                      aria-hidden
+                      className="relative z-10 h-2.5 w-2.5 shrink-0 rounded-full bg-primary shadow-[0_0_0_4px_#ffffff] transition-transform duration-300 group-hover:scale-110 sm:h-3 sm:w-3"
+                    />
+                  </div>
 
-                  <div
-                    className={`group relative flex-1 overflow-hidden rounded-2xl border p-5 backdrop-blur-sm transition-all duration-500 sm:p-6 ${
-                      isActive
-                        ? "border-gold/25 bg-white/[0.06] shadow-[0_0_44px_-14px_rgba(201,162,39,0.4)]"
-                        : "border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.04]"
-                    }`}
-                  >
-                    <h3
-                      className={`relative text-[19px] font-semibold transition-colors duration-500 sm:text-[21px] ${
-                        isActive ? "text-white" : "text-white/85"
+                  <div className="flex items-stretch gap-3 sm:gap-5">
+                    <div className="flex shrink-0 items-center py-3.5 sm:py-5">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-primary-light bg-primary-light/70 shadow-sm transition-colors duration-300 group-hover:border-primary/30 group-hover:bg-primary-light sm:h-16 sm:w-16">
+                        <Icon
+                          aria-hidden
+                          strokeWidth={1.75}
+                          className="h-5 w-5 text-primary sm:h-7 sm:w-7"
+                        />
+                      </div>
+                    </div>
+
+                    <div
+                      className={`flex flex-1 items-center gap-3 py-3.5 transition-transform duration-300 group-hover:translate-x-1 sm:gap-5 sm:py-5 ${
+                        i !== 0 ? "border-t border-primary-light/60" : ""
                       }`}
                     >
-                      {step.title}
-                    </h3>
-                    <p
-                      className={`relative mt-2 max-w-xl text-[14.5px] leading-relaxed transition-opacity duration-500 ${
-                        isActive ? "text-white/65" : "text-white/50"
-                      }`}
-                    >
-                      {step.note}
-                    </p>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-[15px] font-bold text-navy sm:text-[19px]">
+                          {step.title}
+                        </h3>
+                        <p className="mt-1 max-w-[380px] text-[12.5px] leading-relaxed text-ink-soft sm:text-[14px]">
+                          {step.description}
+                        </p>
+                      </div>
+
+                      <span
+                        aria-hidden
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-line bg-white text-primary shadow-sm transition-all duration-300 group-hover:border-primary group-hover:bg-primary group-hover:text-white sm:h-10 sm:w-10"
+                      >
+                        <ArrowRight className="h-3 w-3 sm:h-[15px] sm:w-[15px]" strokeWidth={2} />
+                      </span>
+                    </div>
                   </div>
                 </motion.div>
               );
             })}
           </div>
         </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 0.6, ease: EASE_PREMIUM, delay: 0.1 }}
-          className="relative mx-auto mt-16 max-w-3xl text-center"
-        >
-          <motion.div
-            aria-hidden
-            className="pointer-events-none absolute left-1/2 top-1/2 h-24 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/20 blur-[60px]"
-            animate={{ opacity: [0.3, 0.6, 0.3] }}
-            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <div className="relative">
-            <CTAButton href="#book-audit" arrow>
-              Book a Free Growth Audit
-            </CTAButton>
-          </div>
-        </motion.div>
       </div>
     </section>
   );
