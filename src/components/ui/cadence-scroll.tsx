@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "motion/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { motion } from "motion/react";
 import { EASE_PREMIUM, fadeUp } from "@/lib/motion";
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
+// Owl Carousel's default slide transition on canopymanagement.com's
+// reference section: translateX over ~500ms with an ease-out-quad feel.
+const SLIDE_EASE = [0.25, 0.46, 0.45, 0.94] as const;
 
 type CadenceItem = {
   title: string;
@@ -62,35 +60,62 @@ function CadenceRow({
       viewport={{ once: true, amount: 0.6 }}
       className="relative flex items-start gap-6 sm:gap-8"
     >
-      <motion.span
-        animate={{ scale: isActive ? 1.1 : 1 }}
-        transition={{ duration: 0.4, ease: EASE_PREMIUM }}
-        className={`relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 text-[13px] font-bold backdrop-blur-sm transition-all duration-500 sm:h-12 sm:w-12 ${
-          isActive
-            ? "border-gold bg-gold/15 text-gold shadow-[0_0_20px_2px_rgba(201,162,39,0.4)]"
-            : "border-white/25 bg-white/10 text-white/70"
-        }`}
-      >
-        {pad(index + 1)}
-      </motion.span>
+      {/* Fixed-size slot keeps the connecting line centered; only the dot
+          inside grows from a plain marker into a numbered, glowing circle
+          when active, matching the reference's ::before pseudo-element. */}
+      <div className="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center sm:h-12 sm:w-12">
+        <motion.span
+          animate={{
+            width: isActive ? 44 : 12,
+            height: isActive ? 44 : 12,
+            backgroundColor: isActive ? "rgba(201,162,39,1)" : "rgba(255,255,255,0.35)",
+            boxShadow: isActive
+              ? "0 0 0 6px rgba(201,162,39,0.18), 0 0 20px 4px rgba(201,162,39,0.45)"
+              : "0 0 0 0 rgba(201,162,39,0)",
+          }}
+          transition={{ duration: 0.45, ease: EASE_PREMIUM }}
+          className="flex items-center justify-center rounded-full"
+        >
+          <motion.span
+            animate={{ opacity: isActive ? 1 : 0, scale: isActive ? 1 : 0.4 }}
+            transition={{
+              duration: 0.25,
+              delay: isActive ? 0.2 : 0,
+              ease: EASE_PREMIUM,
+            }}
+            className="text-[13px] font-bold text-white"
+          >
+            {pad(index + 1)}
+          </motion.span>
+        </motion.span>
+      </div>
 
       <div className="min-w-0 pt-1">
         <h3
           className={`text-2xl font-semibold transition-colors duration-500 sm:text-[26px] ${
-            isActive ? "text-white" : "text-white/60"
+            isActive ? "text-white" : "text-white/50"
           }`}
         >
           {item.title}
         </h3>
-        <p
-          className={`mt-3 max-w-md leading-relaxed transition-all duration-500 ${
-            isActive
-              ? "text-[18px] text-white/75"
-              : "text-[15px] text-white/40"
+        {/* Accordion reveal, matching the reference's collapsed-title /
+            expanded-active rhythm — grid-rows interpolation animates to the
+            content's natural height without a JS measurement pass. */}
+        <div
+          className={`grid transition-[grid-template-rows] duration-500 ease-out ${
+            isActive ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
           }`}
         >
-          {item.description}
-        </p>
+          <div className="overflow-hidden">
+            <p
+              className={`max-w-md text-[17px] leading-relaxed text-white/75 transition-opacity duration-500 ${
+                isActive ? "mt-3 opacity-100 delay-150" : "opacity-0"
+              }`}
+            >
+              {item.description}
+            </p>
+          </div>
+        </div>
       </div>
     </motion.div>
   );
@@ -98,43 +123,10 @@ function CadenceRow({
 
 export function CadenceScroll({ items }: Readonly<CadenceScrollProps>) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const gridRef = useRef<HTMLDivElement | null>(null);
-  const paneRef = useRef<HTMLDivElement | null>(null);
-  const trackRef = useRef<HTMLDivElement | null>(null);
-
-  const { scrollYProgress: trackProgress } = useScroll({
-    target: trackRef,
-    offset: ["start start", "end end"],
-  });
-  const lineScale = useTransform(trackProgress, [0, 1], [0, 1]);
-  const dotTop = useTransform(trackProgress, [0, 1], ["0%", "100%"]);
-  const dotOpacity = useTransform(trackProgress, [0, 0.02, 0.98, 1], [0, 1, 1, 0]);
-
-  // Same pin workaround documented in scroll-01.tsx: globals.css sets
-  // overflow-x:hidden on html/body (guarding the hero's 3D scene), which
-  // disqualifies native `position: sticky` for descendants anywhere on the
-  // page. GSAP's pin drives `position:fixed` directly instead.
-  useEffect(() => {
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    if (prefersReducedMotion || !gridRef.current || !paneRef.current) return;
-
-    const trigger = ScrollTrigger.create({
-      trigger: gridRef.current,
-      start: "top top+=96",
-      end: "bottom bottom",
-      pin: paneRef.current,
-      pinSpacing: false,
-      anticipatePin: 1,
-    });
-
-    return () => trigger.kill();
-  }, []);
 
   return (
     <>
-      {/* Mobile / tablet — stacked, no pin */}
+      {/* Mobile / tablet — stacked */}
       <div className="space-y-14 md:hidden">
         {items.map((item, index) => (
           <motion.div
@@ -163,44 +155,48 @@ export function CadenceScroll({ items }: Readonly<CadenceScrollProps>) {
         ))}
       </div>
 
-      {/* Desktop — pinned image left, numbered timeline right */}
-      <div
-        ref={gridRef}
-        className="hidden gap-16 md:grid md:grid-cols-[0.85fr_1fr] lg:gap-20"
-      >
-        <div ref={paneRef}>
+      {/* Desktop — image left, numbered timeline right. Both columns flow
+          normally (no scroll-pin): the image still swaps to match whichever
+          step is centered in view, it just doesn't try to stick to the
+          screen while scrolling. That GSAP pin needed an inflated minimum
+          height on the timeline column to give itself enough scroll runway
+          to stay valid, which was the source of the oversized gaps and
+          dead scroll space — removing the pin removes that need outright. */}
+      <div className="hidden items-start gap-16 md:grid md:grid-cols-[0.85fr_1fr] lg:gap-20">
+        <div>
+          {/* Not `sticky` — globals.css sets overflow-x:hidden on html/body
+              (guarding the hero's 3D scene), which disables native sticky
+              positioning for every descendant on the page, not just this
+              one. The image just sits in normal flow instead. */}
           <div className="relative h-[60vh] max-h-[560px] min-h-[420px] overflow-hidden rounded-[2rem] border border-white/15 bg-white p-3 shadow-2xl shadow-black/20">
-            {items.map((item, index) => (
-              <motion.img
-                key={`${item.title}-${index}`}
-                src={item.media}
-                alt={item.title}
-                className="absolute inset-3 h-[calc(100%-1.5rem)] w-[calc(100%-1.5rem)] rounded-[1.5rem] object-contain"
-                initial={{ opacity: index === 0 ? 1 : 0, scale: index === 0 ? 1 : 1.03 }}
-                animate={{
-                  opacity: activeIndex === index ? 1 : 0,
-                  scale: activeIndex === index ? 1 : 1.03,
-                }}
-                transition={{ duration: 0.5, ease: EASE_PREMIUM }}
-              />
-            ))}
+            {/* Horizontal slide, mirroring the Owl Carousel used on the
+                reference site: all frames sit side by side and the strip
+                translates by one frame width per step (~500ms ease-out),
+                instead of a crossfade. */}
+            <motion.div
+              className="flex h-full"
+              animate={{ x: `-${activeIndex * 100}%` }}
+              transition={{ duration: 0.5, ease: SLIDE_EASE }}
+            >
+              {items.map((item, index) => (
+                <div key={`${item.title}-${index}`} className="h-full w-full shrink-0">
+                  <img
+                    src={item.media}
+                    alt={item.title}
+                    className="h-full w-full rounded-[1.5rem] object-contain"
+                  />
+                </div>
+              ))}
+            </motion.div>
           </div>
         </div>
 
-        <div ref={trackRef} className="relative py-[8vh]">
-          <div className="absolute left-[21px] top-2 bottom-2 w-px bg-white/15">
-            <motion.div
-              style={{ scaleY: lineScale }}
-              className="h-full w-full origin-top bg-gradient-to-b from-primary-bright to-gold"
-            />
-            <motion.div
-              aria-hidden
-              style={{ top: dotTop, opacity: dotOpacity }}
-              className="absolute left-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold shadow-[0_0_16px_4px_rgba(201,162,39,0.65)]"
-            />
-          </div>
+        <div className="relative py-2">
+          {/* Static connector, matching the reference's always-fully-drawn
+              line — the motion lives in the step markers, not the line. */}
+          <div className="absolute left-[21px] top-2 bottom-2 w-px bg-gradient-to-b from-primary-bright/50 to-gold/50" />
 
-          <div className="flex flex-col gap-16">
+          <div className="flex flex-col gap-6">
             {items.map((item, index) => (
               <CadenceRow
                 key={`${item.title}-${index}`}

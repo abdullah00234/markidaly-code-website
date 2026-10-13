@@ -1,14 +1,14 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import TrustedBy from "@/components/TrustedBy";
-import BrandResults from "@/components/BrandResults";
+import ProvenPerformance from "@/components/ProvenPerformance";
 import SoundFamiliar from "@/components/SoundFamiliar";
 import Services from "@/components/Services";
 import Founders from "@/components/Founders";
 import WhyMarkidly from "@/components/WhyMarkidly";
 import CaseStudies from "@/components/CaseStudies";
+import ProfitCalculator from "@/components/ProfitCalculator";
 import OurProcess from "@/components/OurProcess";
-import HowWeWork from "@/components/HowWeWork";
 import GrowthAudit from "@/components/GrowthAudit";
 import Testimonials from "@/components/Testimonials";
 import FAQ from "@/components/FAQ";
@@ -18,9 +18,10 @@ import Footer from "@/components/Footer";
 
 // Homepage section order (approved storytelling flow):
 // Hero -> Proof Bar -> Sound Familiar -> Services -> About/Founders ->
-// Why Choose Us -> Case Studies -> Our Process ->
-// How We Work -> Growth Audit -> Testimonials -> FAQ -> Final CTA ->
+// Why Choose Us -> Case Studies -> Profit Calculator -> Our Process ->
+// Growth Audit -> Testimonials -> FAQ -> Final CTA ->
 // Contact -> Footer
+// (How We Work / "Our Approach" section hidden — component kept in codebase)
 export default function Home() {
   return (
     <>
@@ -28,14 +29,14 @@ export default function Home() {
       <main>
         <Hero />
         <TrustedBy />
-        <BrandResults />
+        <ProvenPerformance />
         <SoundFamiliar />
         <Services />
         <Founders />
         <WhyMarkidly />
         <CaseStudies />
+        <ProfitCalculator />
         <OurProcess />
-        <HowWeWork />
         <GrowthAudit />
         <Testimonials />
         <FAQ />

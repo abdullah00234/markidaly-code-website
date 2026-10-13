@@ -1,54 +1,90 @@
 "use client";
 
-import { motion } from "motion/react";
-import { BrandScroller, BrandScrollerReverse, type BrandLogo } from "./ui/brand-scroller";
-import Eyebrow from "./ui/Eyebrow";
-import { fadeUp, EASE_PREMIUM } from "@/lib/motion";
+import type { CSSProperties } from "react";
+import Image from "next/image";
+import { motion, useReducedMotion } from "motion/react";
+import { EASE_PREMIUM } from "@/lib/motion";
+import { Marquee } from "@/components/ui/marquee";
 
-const ROW_1: BrandLogo[] = [
-  { name: "CLn Skincare", src: "/images/logos/cln.png", width: 607, height: 212 },
-  { name: "Mina Morocco", src: "/images/logos/mina.png", width: 651, height: 220 },
-  { name: "MVP Hair Care", src: "/images/logos/mvp-hair-care.png", width: 157, height: 220, size: "tall" },
-  { name: "Tosali", src: "/images/logos/tosali.png", width: 1220, height: 220 },
+type Brand = {
+  name: string;
+  logo: string;
+};
+
+const BRANDS: Brand[] = [
+  { name: "Mina Morocco", logo: "/images/brands/mina-morocco.svg" },
+  { name: "Darsa Organics", logo: "/images/brands/darsa-organics.svg" },
+  { name: "CLn Skincare", logo: "/images/brands/cln-skincare.svg" },
+  { name: "Herb to Body", logo: "/images/brands/herb-to-body.svg" },
+  { name: "Darsam Chai", logo: "/images/brands/darsam-chai.svg" },
+  { name: "KUE", logo: "/images/brands/kue.svg" },
+  { name: "Karlsten Pest Control", logo: "/images/brands/karlsten-pest-control.svg" },
+  { name: "LifeSource Vitamins", logo: "/images/brands/lifesource-vitamins.svg" },
+  { name: "Peacock Max", logo: "/images/brands/peacock-max.svg" },
+  { name: "Tosali", logo: "/images/brands/tosali.svg" },
+  { name: "MVP Hair Care", logo: "/images/brands/mvp-hair-care.svg" },
 ];
 
-const ROW_2: BrandLogo[] = [
-  { name: "Darsa Organics", src: "/images/logos/darsa-organics.png", width: 220, height: 220, size: "tall" },
-  { name: "Darsam Chai", src: "/images/logos/darsam-chai.png", width: 452, height: 160 },
-  { name: "Peacock Max", src: "/images/logos/peacock-max.png", width: 953, height: 220 },
-  { name: "Kue", src: "/images/logos/kue.png", width: 146, height: 110 },
-  { name: "Karlsten Pest Control", src: "/images/logos/karlsten-pest-control.png", width: 427, height: 152 },
-];
+const headingReveal = {
+  hidden: { opacity: 0, y: 14 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE_PREMIUM } },
+};
 
 export default function TrustedBy() {
+  const prefersReducedMotion = useReducedMotion();
+  const initial = prefersReducedMotion ? "show" : "hidden";
+
   return (
-    <section className="bg-bg py-14 sm:py-16">
+    <section aria-labelledby="trusted-brands-heading" className="bg-white py-16 sm:py-20 lg:py-[90px]">
       <div className="container-page">
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 0.6, ease: EASE_PREMIUM }}
-          className="mx-auto max-w-xl text-center"
+          initial={initial}
+          whileInView="show"
+          viewport={{ once: true, amount: 0.3 }}
+          className="mx-auto max-w-5xl"
         >
-          <Eyebrow>Trusted Partners</Eyebrow>
-          <h2 className="font-[family-name:var(--font-heading)] text-[22px] font-bold leading-snug tracking-tight text-navy sm:text-[26px]">
-            Backed by established brands across skincare, wellness &amp;
-            specialty retail
-          </h2>
+          <motion.h2
+            id="trusted-brands-heading"
+            variants={headingReveal}
+            className="mb-8 font-[family-name:var(--font-heading)] text-[15px] font-semibold leading-[1.2] text-ink"
+          >
+            Trusted by leading brands worldwide
+          </motion.h2>
         </motion.div>
 
         <motion.div
-          variants={fadeUp}
-          initial="hidden"
+          initial={initial}
           whileInView="show"
           viewport={{ once: true, amount: 0.3 }}
-          className="relative mt-10 overflow-hidden rounded-[28px] border border-line bg-white py-8 shadow-[0_20px_50px_-32px_rgba(11,31,58,0.18)] sm:mt-12"
+          variants={headingReveal}
+          className="relative mx-auto max-w-5xl"
+          style={{
+            maskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
+          }}
         >
-          <div className="flex flex-col gap-2">
-            <BrandScroller items={ROW_1} duration="26s" />
-            <BrandScrollerReverse items={ROW_2} duration="30s" />
-          </div>
+          <Marquee
+            pauseOnHover
+            repeat={2}
+            className="[--gap:2.75rem] py-1 sm:[--gap:3.5rem]"
+            style={{ "--duration": "60s" } as CSSProperties}
+          >
+            {BRANDS.map((brand) => (
+              <span
+                key={brand.name}
+                className="relative block h-10 w-[110px] shrink-0 sm:h-12 sm:w-[140px] md:h-14 md:w-[160px]"
+              >
+                <Image
+                  src={brand.logo}
+                  alt={brand.name}
+                  fill
+                  sizes="160px"
+                  className="object-contain opacity-60 grayscale contrast-125 brightness-[0.92] transition-opacity duration-300 group-hover:opacity-100"
+                />
+              </span>
+            ))}
+          </Marquee>
         </motion.div>
       </div>
     </section>

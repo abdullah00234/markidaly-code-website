@@ -18,23 +18,35 @@
      Results, Final CTA) so they read as one visual family. Ends in deep
      navy rather than pure black to stay off large black sections. */
   --gradient-hero: linear-gradient(160deg, #1793c6 0%, #0c78b8 45%, #0b1f3a 100%);
+  /* Darker variant of the above for the Hero section itself — same hue
+     progression, pulled down toward near-black navy so the section reads
+     noticeably darker than the shared .bg-gradient-hero used elsewhere. */
+  --gradient-hero-dark: linear-gradient(160deg, #0f4a73 0%, #0a2f52 45%, #060f1f 100%);
   --color-navy: #0b1f3a;
   --color-navy-soft: #16294a;
   --color-gold: #c9a227;
   --color-gold-soft: #e4d4a3;
   --color-bg: #f7f9fc;
   --color-white: #ffffff;
+  /* Muted "dark white" used for Hero section copy — softer than pure
+     white so it sits more gently against the dark hero gradient. */
+  --color-hero-white: #e7e9ec;
   --color-ink: #101828;
   --color-ink-soft: #4b5768;
   --color-line: #e3e8f0;
 
-  /* Typography — h1 uses Montserrat, h2/h3/h4 and body copy use Poppins */
-  --font-h1: var(--font-montserrat), "Montserrat", ui-sans-serif, sans-serif;
-  --font-heading: var(--font-poppins), "Poppins", ui-sans-serif, sans-serif;
-  --font-body: var(--font-poppins), "Poppins", ui-sans-serif, sans-serif;
+  /* Typography — Satoshi for display/headings, DM Sans for body/UI copy */
+  --font-h1: var(--font-satoshi), "Satoshi", ui-sans-serif, sans-serif;
+  --font-heading: var(--font-satoshi), "Satoshi", ui-sans-serif, sans-serif;
+  --font-body: var(--font-dm-sans), "DM Sans", ui-sans-serif, sans-serif;
 
   /* Container */
   --container-page: 1240px;
+
+  /* Fixed navbar's worst-case footprint (height + floating-pill top
+     margin, scrolled state, md+ breakpoint) — used as the clearance
+     baseline for anything pinned/sticky below the navbar. */
+  --nav-height: 88px;
 
   /* Easing */
   --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
@@ -156,6 +168,10 @@
 
   .bg-gradient-hero {
     background-image: var(--gradient-hero);
+  }
+
+  .bg-gradient-hero-dark {
+    background-image: var(--gradient-hero-dark);
   }
 
   .text-gradient-brand {

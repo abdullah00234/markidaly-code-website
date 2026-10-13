@@ -1,19 +1,21 @@
 import type { Metadata } from "next";
-import { Montserrat, Poppins } from "next/font/google";
+import { DM_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import SmoothScroll from "@/components/SmoothScroll";
+import { Component as CursorFollower } from "@/components/ui/cursor-follower";
 import "./globals.css";
 
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  variable: "--font-montserrat",
-  weight: ["600", "700", "800", "900"],
+const satoshi = localFont({
+  src: "../fonts/satoshi/Satoshi-Variable.woff2",
+  variable: "--font-satoshi",
+  weight: "300 900",
   display: "swap",
 });
 
-const poppins = Poppins({
+const dmSans = DM_Sans({
   subsets: ["latin"],
-  variable: "--font-poppins",
-  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-dm-sans",
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -42,9 +44,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${montserrat.variable} ${poppins.variable}`}>
+    <html lang="en" className={`${satoshi.variable} ${dmSans.variable}`}>
       <body>
         <SmoothScroll />
+        <CursorFollower />
         {children}
       </body>
     </html>

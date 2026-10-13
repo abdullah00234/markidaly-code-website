@@ -94,7 +94,9 @@ export default function Navbar() {
             }`}
           >
             <CTAButton
-              href="#book-audit"
+              href="https://calendly.com/contact-markidly/30min"
+              target="_blank"
+              rel="noopener noreferrer"
               variant={scrolled ? "ghost" : "outline-dark"}
               size="sm"
               arrow
@@ -158,7 +160,9 @@ export default function Navbar() {
             </ul>
             <div className="flex flex-col gap-3 border-t border-line px-4 py-5">
               <CTAButton
-                href="#book-audit"
+                href="https://calendly.com/contact-markidly/30min"
+                target="_blank"
+                rel="noopener noreferrer"
                 variant="ghost"
                 arrow
                 onClick={() => setMobileOpen(false)}

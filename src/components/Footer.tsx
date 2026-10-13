@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Mail } from "lucide-react";
+import { Mail, Phone, MapPin } from "lucide-react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Linkedin01Icon } from "@hugeicons/core-free-icons";
 import CTAButton from "./ui/CTAButton";
@@ -22,8 +22,9 @@ const COMPANY_LINKS = [
   { label: "Contact", href: "#book-audit" },
 ];
 
-// Placeholder contact details — confirm before publishing.
-const EMAIL = "hello@markidly.com";
+const EMAIL = "Contact@markidly.com";
+const PHONE = "+92 332 4659645";
+const ADDRESS = "11 Commercial, Nasheman Iqbal Phase 1, Lahore";
 const LINKEDIN_URL = "https://linkedin.com/company/markidly";
 
 export default function Footer() {
@@ -93,6 +94,17 @@ export default function Footer() {
               <Mail className="h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden />
               {EMAIL}
             </a>
+            <a
+              href={`tel:${PHONE.replace(/\s+/g, "")}`}
+              className="inline-flex items-center gap-2 text-[14.5px] text-white transition-opacity hover:opacity-75"
+            >
+              <Phone className="h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden />
+              {PHONE}
+            </a>
+            <p className="inline-flex items-start gap-2 text-[14.5px] text-white">
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden />
+              {ADDRESS}
+            </p>
             <a
               href={LINKEDIN_URL}
               target="_blank"

@@ -8,7 +8,7 @@ export default function CaseStudySlide({ slide }: { slide: CaseStudySlideData })
   return (
     <div className="grid gap-12 md:grid-cols-2 md:items-center md:gap-16 lg:gap-20">
       <div>
-        <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-primary-light">
+        <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-white">
           Featured Case Study
         </p>
 

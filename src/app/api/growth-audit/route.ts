@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { name, email, company, website, revenueRange, helpNeeded, markets, timeline, message } = body ?? {};
+  const { name, email, company, website, revenueRange, helpNeeded, markets, message } = body ?? {};
 
   if (!name || !email || !company || !website || !revenueRange) {
     return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
@@ -33,7 +33,6 @@ export async function POST(request: Request) {
     `Monthly Amazon Revenue Range: ${revenueRange}`,
     `Needs help with: ${Array.isArray(helpNeeded) && helpNeeded.length ? helpNeeded.join(", ") : "—"}`,
     `Target market(s): ${Array.isArray(markets) && markets.length ? markets.join(", ") : "—"}`,
-    `Timeline: ${timeline || "—"}`,
     "",
     "Message:",
     message ? String(message) : "(none)",

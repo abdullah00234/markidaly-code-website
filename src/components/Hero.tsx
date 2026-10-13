@@ -22,6 +22,15 @@ export default function Hero() {
     <section
       ref={setSectionEl}
       className="relative h-screen overflow-hidden rounded-b-[40px] sm:rounded-b-[56px] lg:rounded-b-[72px]"
+      // WebKit (Safari on both macOS and iOS) flickers/strobes on a
+      // rounded-corner + overflow-hidden container when a descendant gets
+      // its own compositing layer that repaints every frame — here, the
+      // GSAP-pinned (position: fixed) WebGL canvas plus the animated
+      // background-position gradient layers above. Forcing WebKit onto its
+      // mask-based clip path instead of its border-radius clip path avoids
+      // that repaint bug; the mask is fully opaque so nothing is visually
+      // cropped. No-op on non-WebKit browsers.
+      style={{ WebkitMaskImage: "-webkit-radial-gradient(white, black)" }}
     >
       {/* Solid brand-gradient ground, no stock photography or dashboard
           screenshots — depth comes from the dot grid + the 3D scene layered
@@ -30,7 +39,7 @@ export default function Hero() {
           WebGL is unavailable or the device is low-end (see HeroScene's
           canvas.style.display = "none" path), and adds a subtle extra
           touch of life underneath the 3D scene the rest of the time. */}
-      <div aria-hidden className="absolute inset-0 bg-gradient-hero animate-hero-gradient" />
+      <div aria-hidden className="absolute inset-0 bg-gradient-hero-dark animate-hero-gradient" />
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-[0.07] animate-hero-grid"

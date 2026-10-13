@@ -1,28 +1,38 @@
 import { CadenceScroll } from "./ui/cadence-scroll";
+import { GradientWave } from "./ui/gradient-wave";
 import Eyebrow from "./ui/Eyebrow";
 
-// Three-phase framing of the account lifecycle — Research, then Design &
-// Optimize, then Grow & Scale. Sits above the tactical five-step "How We
-// Work" breakdown; this is the higher-level story, that is the mechanics.
 const phases = {
   items: [
     {
-      title: "Research",
+      title: "Diagnose",
       description:
-        "Your brand's history is unique, and so is your growth plan. We dig into advertising, listings, conversion, inventory, and operations to surface the real trouble spots and the biggest opportunities in your account, not just the symptom you called about.",
-      media: "/images/our-process/research.svg",
+        "Deep dive into your account, data, and marketplace reality to identify what's really holding growth back.",
+      media: "/images/diagnose-illustration.png",
     },
     {
-      title: "Design & Optimize",
+      title: "Prioritize",
       description:
-        "With a clear plan in place, execution is everything. Our specialists get to work doing what they do best: building a scroll-stopping product listing, allocating the ideal budget, or constructing a laser-focused DSP campaign.",
-      media: "/images/our-process/design-optimize.svg",
+        "Focus on the highest-impact opportunities across advertising, listings, operations, and profitability.",
+      media: "/images/prioritize-illustration.png",
     },
     {
-      title: "Grow & Scale",
+      title: "Execute",
       description:
-        "Once things are dialed in, we ramp up investment in what's working and go after your growth targets, methodically, using everything we learned along the way while protecting margin.",
-      media: "/images/our-process/grow-scale.svg",
+        "Implement a clear, coordinated plan across all key areas of your Amazon business.",
+      media: "/images/execute-illustration.png",
+    },
+    {
+      title: "Measure & Refine",
+      description:
+        "Track what's working, cut what's not, and continuously optimize for stronger, more profitable performance.",
+      media: "/images/measure-refine-illustration.png",
+    },
+    {
+      title: "Scale",
+      description:
+        "Once the foundation is strong, we help you scale sustainably with a proven, repeatable growth system.",
+      media: "/images/scale-illustration.png",
     },
   ],
 };
@@ -33,9 +43,16 @@ export default function OurProcess() {
       id="our-process"
       className="relative overflow-hidden bg-gradient-hero py-24 lg:py-32"
     >
+      <GradientWave
+        className="pointer-events-none"
+        colors={["#0b1f3a", "#0c78b8", "#1793c6", "#0b1f3a", "#16294a", "#0c78b8"]}
+        darkenTop
+        shadowPower={6}
+      />
+
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.06]"
+        className="pointer-events-none absolute inset-0 z-[1] opacity-[0.06]"
         style={{
           backgroundImage:
             "linear-gradient(rgba(255,255,255,0.7) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.7) 1px, transparent 1px)",
@@ -43,15 +60,15 @@ export default function OurProcess() {
         }}
       />
 
-      <div className="container-page relative">
+      <div className="container-page relative z-10">
         <div className="mx-auto max-w-2xl text-center">
           <Eyebrow tone="dark">Our Process</Eyebrow>
           <h2 className="font-[family-name:var(--font-heading)] text-[32px] font-extrabold leading-[1.2] tracking-tight text-white sm:text-[40px]">
-            Every account moves through the same three phases.
+            Every account moves through the same five steps.
           </h2>
           <p className="mt-4 text-[15px] leading-relaxed text-white/60">
-            Research uncovers where the growth is. Design & optimize is where
-            it gets built. Grow & scale is where it compounds.
+            A clear, repeatable system — from diagnosing what's holding you
+            back to scaling what works.
           </p>
         </div>
 

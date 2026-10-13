@@ -52,7 +52,7 @@ export default function CaseStudySlider() {
   };
 
   return (
-    <div className="container-page">
+    <div className="mx-auto max-w-[1600px] px-6 md:px-8 lg:px-12">
       <div
         className="relative overflow-hidden rounded-[32px] border border-white/10 bg-gradient-hero p-6 shadow-[0_32px_72px_-40px_rgba(0,0,0,0.5)] sm:p-10 lg:p-14"
         onMouseEnter={() => setIsPaused(true)}
@@ -60,7 +60,7 @@ export default function CaseStudySlider() {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <AnimatePresence mode="wait" custom={direction} initial={false}>
+        <AnimatePresence mode="popLayout" custom={direction} initial={false}>
           <motion.div
             key={index}
             custom={direction}
@@ -95,9 +95,6 @@ export default function CaseStudySlider() {
           </div>
 
           <div className="flex flex-1 flex-col items-center gap-2.5">
-            <p className="text-[12px] font-semibold tabular-nums tracking-[0.08em] text-white/60">
-              {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
-            </p>
             <div className="flex w-full max-w-[220px] gap-1.5">
               {CASE_STUDY_SLIDES.map((slide, i) => (
                 <div key={slide.brand} className="h-1 flex-1 overflow-hidden rounded-full bg-white/15">

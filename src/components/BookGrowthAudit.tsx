@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import Script from "next/script";
 import { motion } from "motion/react";
 import Eyebrow from "./ui/Eyebrow";
 import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "./ui/field";
@@ -8,15 +9,6 @@ import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Checkbox } from "./ui/checkbox";
 import { EASE_PREMIUM } from "@/lib/motion";
-
-const REVENUE_RANGES = [
-  "Under $400K",
-  "$400K – $1M",
-  "$1M – $5M",
-  "$5M – $15M",
-  "$15M+",
-  "Not sure yet",
-];
 
 const HELP_OPTIONS = [
   "Account Management",
@@ -31,8 +23,6 @@ const HELP_OPTIONS = [
 
 const MARKET_OPTIONS = ["US", "UK", "Europe", "Canada", "Australia", "Other"];
 
-const TIMELINE_OPTIONS = ["Immediately", "Within 1 month", "Within 3 months", "Just exploring"];
-
 type Status = "idle" | "submitting" | "success" | "error";
 
 type FieldErrors = {
@@ -43,7 +33,6 @@ type FieldErrors = {
   revenueRange?: string;
   helpNeeded?: string;
   markets?: string;
-  timeline?: string;
 };
 
 function toggleValue(list: string[], value: string) {
@@ -58,7 +47,6 @@ export default function BookGrowthAudit() {
   const [revenueRange, setRevenueRange] = useState("");
   const [helpNeeded, setHelpNeeded] = useState<string[]>([]);
   const [markets, setMarkets] = useState<string[]>([]);
-  const [timeline, setTimeline] = useState("");
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [submitError, setSubmitError] = useState("");
@@ -78,7 +66,6 @@ export default function BookGrowthAudit() {
     if (!revenueRange) next.revenueRange = "Please select a revenue range.";
     if (helpNeeded.length === 0) next.helpNeeded = "Please select at least one option.";
     if (markets.length === 0) next.markets = "Please select at least one market.";
-    if (!timeline) next.timeline = "Please select a timeline.";
     return next;
   }
 
@@ -104,7 +91,6 @@ export default function BookGrowthAudit() {
           revenueRange,
           helpNeeded,
           markets,
-          timeline,
           message,
         }),
       });
@@ -163,6 +149,16 @@ export default function BookGrowthAudit() {
               across every account, working alongside a team of specialists in
               advertising, listings, inventory, and operations.
             </p>
+
+            <div
+              className="calendly-inline-widget mt-8"
+              data-url="https://calendly.com/contact-markidly/30min"
+              style={{ minWidth: "320px", height: "700px" }}
+            />
+            <Script
+              src="https://assets.calendly.com/assets/external/widget.js"
+              strategy="lazyOnload"
+            />
           </motion.div>
 
           <motion.form
@@ -238,24 +234,14 @@ export default function BookGrowthAudit() {
               <Field>
                 <FieldLabel htmlFor="revenue">Monthly Amazon Revenue Range</FieldLabel>
                 <FieldContent>
-                  <select
+                  <Input
                     id="revenue"
                     value={revenueRange}
                     onChange={(e) => {
                       setRevenueRange(e.target.value);
                       clearError("revenueRange");
                     }}
-                    className="h-12 w-full rounded-xl border border-line bg-white px-4 text-[15px] text-navy transition-colors duration-200 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  >
-                    <option value="" disabled>
-                      Select a range
-                    </option>
-                    {REVENUE_RANGES.map((range) => (
-                      <option key={range} value={range}>
-                        {range}
-                      </option>
-                    ))}
-                  </select>
+                  />
                   <FieldError>{errors.revenueRange}</FieldError>
                 </FieldContent>
               </Field>
@@ -302,35 +288,6 @@ export default function BookGrowthAudit() {
                   ))}
                 </div>
                 <FieldError>{errors.markets}</FieldError>
-              </FieldSet>
-
-              <FieldSet>
-                <FieldLegend>Timeline</FieldLegend>
-                <div className="flex flex-wrap gap-2.5" role="radiogroup" aria-label="Timeline">
-                  {TIMELINE_OPTIONS.map((option) => {
-                    const isActive = timeline === option;
-                    return (
-                      <button
-                        key={option}
-                        type="button"
-                        role="radio"
-                        aria-checked={isActive}
-                        onClick={() => {
-                          setTimeline(option);
-                          clearError("timeline");
-                        }}
-                        className={`rounded-full border px-4 py-2 text-[13.5px] font-medium transition-colors duration-200 ${
-                          isActive
-                            ? "border-primary bg-primary text-white"
-                            : "border-line bg-white text-ink-soft hover:border-primary/40 hover:text-primary"
-                        }`}
-                      >
-                        {option}
-                      </button>
-                    );
-                  })}
-                </div>
-                <FieldError>{errors.timeline}</FieldError>
               </FieldSet>
 
               <Field>

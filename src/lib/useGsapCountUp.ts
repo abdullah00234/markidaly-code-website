@@ -16,7 +16,10 @@ if (typeof window !== "undefined") {
  */
 export function useGsapCountUp(value: number, duration = 1.4) {
   const ref = useRef<HTMLElement>(null);
-  const [display, setDisplay] = useState(0);
+  // Initial state is the final value, not 0 — so SSR output, no-JS
+  // fallback, crawlers, and the moment before the animation kicks in all
+  // show the real number instead of a "$0M+" flash.
+  const [display, setDisplay] = useState(value);
 
   useEffect(() => {
     const el = ref.current;
@@ -26,10 +29,7 @@ export function useGsapCountUp(value: number, duration = 1.4) {
       "(prefers-reduced-motion: reduce)"
     ).matches;
 
-    if (prefersReducedMotion) {
-      const raf = requestAnimationFrame(() => setDisplay(value));
-      return () => cancelAnimationFrame(raf);
-    }
+    if (prefersReducedMotion) return;
 
     const counter = { val: 0 };
     const tween = gsap.to(counter, {

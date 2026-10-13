@@ -116,17 +116,17 @@ export default function WhyMarkidly() {
               <motion.div
                 key={item.title}
                 variants={cardVariants}
-                className="group relative flex flex-col overflow-hidden rounded-2xl border border-navy/10 bg-[#f7f9fc] p-6 transition-all duration-500 hover:border-gold/40 hover:shadow-[0_0_44px_-14px_rgba(201,162,39,0.4)] sm:p-7"
+                className="group relative flex flex-col overflow-hidden rounded-2xl border border-navy/10 bg-[#f7f9fc] p-6 transition-all duration-500 hover:border-primary/40 hover:shadow-[0_0_44px_-14px_rgba(31,94,255,0.4)] sm:p-7"
               >
                 <div
                   aria-hidden
                   className="pointer-events-none absolute inset-0 z-0 bg-gradient-to-br from-white/90 via-transparent to-navy/[0.05]"
                 />
                 <div className="relative z-10 mb-6 flex items-start justify-between">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-navy/20 bg-navy/5 text-navy transition-all duration-500 group-hover:border-gold group-hover:bg-gold/15 group-hover:text-gold group-hover:shadow-[0_0_20px_2px_rgba(201,162,39,0.4)]">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-navy/20 bg-navy/5 text-navy transition-all duration-500 group-hover:border-primary group-hover:bg-primary/15 group-hover:text-primary group-hover:shadow-[0_0_20px_2px_rgba(31,94,255,0.4)]">
                     <Icon className="h-5 w-5" strokeWidth={2} />
                   </span>
-                  <span className="text-xs font-semibold uppercase tracking-[0.14em] text-navy/30 transition-colors duration-500 group-hover:text-gold">
+                  <span className="text-xs font-semibold uppercase tracking-[0.14em] text-navy/30 transition-colors duration-500 group-hover:text-primary">
                     {pad(index + 1)}
                   </span>
                 </div>

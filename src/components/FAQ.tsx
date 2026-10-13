@@ -61,7 +61,7 @@ export default function FAQ() {
           </h2>
         </div>
 
-        <div className="mx-auto mt-14 max-w-2xl divide-y divide-line border-y border-line">
+        <div className="mx-auto mt-14 max-w-4xl divide-y divide-line border-y border-line">
           {FAQS.map((item, i) => {
             const isOpen = open === i;
             return (
@@ -91,7 +91,7 @@ export default function FAQ() {
                       transition={{ duration: 0.35, ease: EASE_PREMIUM }}
                       className="overflow-hidden"
                     >
-                      <p className="pb-6 max-w-xl text-[14.5px] leading-relaxed text-ink-soft">
+                      <p className="pb-6 max-w-3xl text-[14.5px] leading-relaxed text-ink-soft">
                         {item.a}
                       </p>
                     </motion.div>

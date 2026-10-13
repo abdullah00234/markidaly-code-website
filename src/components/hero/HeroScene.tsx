@@ -4,16 +4,8 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import {
-  Search,
-  Target,
-  ListChecks,
-  Palette,
-  ShieldCheck,
-  Compass,
-  Image as FrameIcon,
-  type LucideIcon,
-} from "lucide-react";
+import { Image as FrameIcon } from "lucide-react";
+import Image from "next/image";
 import CTAButton from "../ui/CTAButton";
 // The Markidly mark — imported (not moved into public/) so this is the
 // exact existing asset, resolved to a hashed, webpack/Turbopack-served URL.
@@ -44,7 +36,7 @@ type HeroSceneProps = {
 type ServiceNode = {
   label: string;
   tagline: string;
-  icon: LucideIcon;
+  icon: string;
   x: number;
   y: number;
   z: number;
@@ -60,30 +52,37 @@ type ServiceNode = {
 // or marketplace UI. Positions stay right-of-core so nodes never drift into
 // the copy column.
 const SERVICE_NODES: ServiceNode[] = [
-  { label: "Amazon SEO", tagline: "Rank higher, sell more", icon: Search, x: -5.5, y: 5.5, z: 1.5, revealStart: 0.02, revealEnd: 0.16 },
-  { label: "Amazon PPC", tagline: "Profitable ad spend", icon: Target, x: 6, y: 6.5, z: -1, revealStart: 0.22, revealEnd: 0.36 },
-  { label: "Listing Optimization", tagline: "Convert more browsers", icon: ListChecks, x: 8, y: 0, z: 1, revealStart: 0.63, revealEnd: 0.75 },
-  { label: "Creative & A+ Content", tagline: "Brand Story that sells", icon: Palette, x: 7.5, y: -5.5, z: 0.5, revealStart: 0.42, revealEnd: 0.56 },
-  { label: "Account Management", tagline: "Health, ops, compliance", icon: ShieldCheck, x: -2, y: -6, z: -1.5, revealStart: 0.63, revealEnd: 0.75 },
-  { label: "Growth Strategy", tagline: "One plan, one team", icon: Compass, x: -8, y: 0.5, z: -3, revealStart: 0.63, revealEnd: 0.75 },
+  { label: "Amazon SEO", tagline: "Rank higher, sell more", icon: "/images/hero-icons/seo.png", x: -5.5, y: 5.5, z: 1.5, revealStart: 0.02, revealEnd: 0.16 },
+  { label: "Amazon PPC", tagline: "Profitable ad spend", icon: "/images/hero-icons/ppc.png", x: 6, y: 6.5, z: -1, revealStart: 0.22, revealEnd: 0.36 },
+  { label: "Listing Optimization", tagline: "Convert more browsers", icon: "/images/hero-icons/listing-optimization.png", x: 8, y: 0, z: 1, revealStart: 0.63, revealEnd: 0.75 },
+  { label: "Creative & A+ Content", tagline: "Brand Story that sells", icon: "/images/hero-icons/creative.png", x: 7.5, y: -5.5, z: 0.5, revealStart: 0.42, revealEnd: 0.56 },
+  { label: "Account Management", tagline: "Health, ops, compliance", icon: "/images/hero-icons/account-management.png", x: -2, y: -6, z: -1.5, revealStart: 0.63, revealEnd: 0.75 },
+  { label: "Growth Strategy", tagline: "One plan, one team", icon: "/images/hero-icons/growth.png", x: -8, y: 0.5, z: -3, revealStart: 0.63, revealEnd: 0.75 },
 ];
 
 // Abstract SEO data labels — never a real keyword tool or ranking dashboard.
-const KEYWORD_ITEMS: { text: string; x: number; y: number; z: number }[] = [
-  { text: "Keyword Research", x: -9, y: 8.5, z: 3 },
-  { text: "Search Strategy", x: -2, y: 9, z: -0.5 },
-  { text: "Ranking Signals", x: -10, y: 3.5, z: -1 },
-  { text: "Competitor Analysis", x: -3.5, y: 2.5, z: 4.5 },
-  { text: "Content Optimization", x: -7.5, y: 6.5, z: 6 },
+// Positions are angularly spread around the SEO node (one direction each —
+// up-left, up-right, left, down-right, down) so their screen-space
+// projections stay clear of each other and of the SEO service panel instead
+// of clustering along the same ray from the node.
+const KEYWORD_ITEMS: { text: string; x: number; y: number; z: number; image?: string }[] = [
+  { text: "Keyword Research", x: -10.5, y: 10.5, z: 3, image: "/images/hero-keyword-research.png" },
+  { text: "Search Strategy", x: -0.5, y: 11, z: -0.5, image: "/images/hero-search-strategy.png" },
+  { text: "Ranking Signals", x: -12.5, y: 4.5, z: -1, image: "/images/hero-ranking-signals.png" },
+  { text: "Competitor Analysis", x: -1.5, y: 1, z: 4.5 },
+  { text: "Content Optimization", x: -7.5, y: -0.5, z: 6, image: "/images/hero-content-optimization.png" },
 ];
 
 // Abstract PPC campaign cards — conceptual, not a real ads dashboard.
+// Same angular-spread principle as KEYWORD_ITEMS above — "Performance" used
+// to sit almost directly above the PPC node, the same direction as
+// "Campaigns", which made it land on top of the Amazon PPC panel.
 const CAMPAIGN_ITEMS: { text: string; x: number; y: number; z: number }[] = [
   { text: "Campaigns", x: 2.5, y: 9.5, z: 1 },
   { text: "Targeting", x: 9.5, y: 10, z: -3.5 },
   { text: "Search Terms", x: 1.5, y: 5, z: -4.5 },
   { text: "Bid Optimization", x: 10, y: 3.5, z: 2 },
-  { text: "Performance", x: 5, y: 8.5, z: -6.5 },
+  { text: "Performance", x: 6, y: 1.5, z: -6.5 },
 ];
 
 // Creative frames — start scattered, assemble into a small grid as the
@@ -92,15 +91,15 @@ const CREATIVE_ITEMS: {
   text: string;
   grid: [number, number, number];
   scatter: [number, number, number];
+  image?: string;
 }[] = [
-  { text: "Product Images", grid: [12, -8.5, 2], scatter: [5.5, -3.5, 8.5] },
-  { text: "A+ Content", grid: [17, -8.5, 2], scatter: [22.5, -2.5, -3.5] },
-  { text: "Brand Story", grid: [12, -13, 2], scatter: [4.5, -16.5, 7.5] },
-  { text: "Storefront", grid: [17, -13, 2], scatter: [23.5, -15.5, -4.5] },
-  { text: "Listing Creative", grid: [14.5, -16, 3.5], scatter: [10.5, -19.5, 9.5] },
+  { text: "Product Images", grid: [12, -8.5, 2], scatter: [5.5, -3.5, 8.5], image: "/images/hero-product-listing.png" },
+  { text: "A+ Content", grid: [17, -8.5, 2], scatter: [22.5, -2.5, -3.5], image: "/images/hero-aplus-content.png" },
+  { text: "Brand Story", grid: [12, -13, 2], scatter: [4.5, -16.5, 7.5], image: "/images/hero-brand-story.png" },
+  { text: "Storefront", grid: [17, -13, 2], scatter: [23.5, -15.5, -4.5], image: "/images/hero-storefront.png" },
+  { text: "Listing Creative", grid: [14.5, -16, 3.5], scatter: [10.5, -19.5, 9.5], image: "/images/hero-listing-creative.png" },
 ];
 
-const RANKING_STEPS = ["#47", "#28", "#12", "#5", "#2"];
 const ACOS_STEPS = ["42%", "31%", "22%", "15%"];
 
 // Camera keyframes for the desktop journey — one continuous move through a
@@ -256,6 +255,8 @@ export default function HeroScene({ sectionEl }: HeroSceneProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const panelChromeRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const panelContentRefs = useRef<(HTMLDivElement | null)[]>([]);
   const iconWrapRefs = useRef<(HTMLDivElement | null)[]>([]);
   const keywordRefs = useRef<(HTMLDivElement | null)[]>([]);
   const campaignRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -267,7 +268,6 @@ export default function HeroScene({ sectionEl }: HeroSceneProps) {
   const creativeActRef = useRef<HTMLDivElement>(null);
   const accountRef = useRef<HTMLDivElement>(null);
   const growthRef = useRef<HTMLDivElement>(null);
-  const rankingValueRef = useRef<HTMLSpanElement>(null);
   const acosValueRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -703,16 +703,22 @@ export default function HeroScene({ sectionEl }: HeroSceneProps) {
       }
     }
 
-    // --- Scroll: ~300vh pinned. The hero (copy + scene together) holds on
-    // screen for that whole distance while scrollProgress (0..1) plays the
-    // five acts in sequence. ---
+    // --- Scroll: ~300vh pinned on desktop while scrollProgress (0..1) plays
+    // the five acts in sequence against the full camera/node/panel journey.
+    // Mobile has none of that visual payoff (panels, keyword/campaign/
+    // creative extras, and the camera's close-up moves are all desktop-only —
+    // see `simplified`/`showPanels` above), so holding the same ~300vh pin
+    // there just reads as a long stretch of empty scrolling before the next
+    // section. The act copy still crossfades on mobile, so it keeps a
+    // shorter pinned distance (~160vh) rather than losing the acts
+    // narrative entirely. ---
     let scrollProgress = prefersReducedMotion ? 1 : 0;
     let scrollTrigger: ScrollTrigger | null = null;
     if (!prefersReducedMotion && sectionEl) {
       scrollTrigger = ScrollTrigger.create({
         trigger: sectionEl,
         start: "top top",
-        end: () => "+=" + window.innerHeight * 3,
+        end: () => "+=" + window.innerHeight * (simplified ? 1.6 : 3),
         scrub: 0.6,
         pin: true,
         anticipatePin: 1,
@@ -811,9 +817,23 @@ export default function HeroScene({ sectionEl }: HeroSceneProps) {
 
         if (showPanels) {
           const { x, y } = projectToScreen(nodeAnchors[i], camera, w, h, worldPos);
-          const panelOpacity = revealT < 0.05 ? 0 : 0.55 + spotlight * 0.45;
+          // The glass chrome (background/border/blur) floors low once a
+          // node's own act has passed, so a resting panel doesn't visually
+          // compete with whichever panel is in spotlight now if their
+          // screen positions pass close during the camera's transit
+          // between acts. The label text/icon is driven independently
+          // (panelContentRefs, not nested inside the chrome's opacity) and
+          // stays close to full opacity at rest — otherwise it would dim
+          // along with the chrome and read as washed-out grey instead of
+          // the intended off-white.
+          const textOpacity = revealT < 0.05 ? 0 : 0.82 + spotlight * 0.18;
+          const chromeOpacity = revealT < 0.05 ? 0 : 0.3 + spotlight * 0.65;
           const panelScale = 0.92 + spotlight * 0.1;
-          applyFloating(panelRefs.current[i], x, y, panelOpacity, panelScale);
+          applyFloating(panelRefs.current[i], x, y, revealT < 0.05 ? 0 : 1, panelScale);
+          const chrome = panelChromeRefs.current[i];
+          if (chrome) chrome.style.opacity = String(chromeOpacity);
+          const content = panelContentRefs.current[i];
+          if (content) content.style.opacity = String(textOpacity);
           const iconWrap = iconWrapRefs.current[i];
           if (iconWrap) {
             iconWrap.style.boxShadow =
@@ -824,28 +844,14 @@ export default function HeroScene({ sectionEl }: HeroSceneProps) {
         }
       });
 
-      // SEO keyword labels + ranking counter — chips track the SEO copy's
-      // own visibility window; the counter steps across the SEO node's
-      // reveal window so it lands on its final value as the line finishes.
+      // SEO keyword labels — chips track the SEO copy's own visibility
+      // window.
       if (showPanels) {
         const seoVis = fadeWindow(p, ACT_WINDOWS.seo.inStart, ACT_WINDOWS.seo.inEnd, ACT_WINDOWS.seo.outStart, ACT_WINDOWS.seo.outEnd);
         keywordAnchors.forEach((a, i) => {
           const { x, y } = projectToScreen(a, camera, w, h, worldPos);
           applyFloating(keywordRefs.current[i], x, y, seoVis * 0.85, 0.9 + seoVis * 0.1);
         });
-      }
-      if (rankingValueRef.current) {
-        const seoNode = SERVICE_NODES[0];
-        const rankT = THREE.MathUtils.clamp(
-          (p - seoNode.revealStart) / (seoNode.revealEnd - seoNode.revealStart || 1),
-          0,
-          1
-        );
-        const idx = Math.min(
-          RANKING_STEPS.length - 1,
-          Math.floor(rankT * RANKING_STEPS.length)
-        );
-        rankingValueRef.current.textContent = RANKING_STEPS[idx];
       }
 
       // PPC campaign cards + ACoS counter
@@ -961,7 +967,11 @@ export default function HeroScene({ sectionEl }: HeroSceneProps) {
         }
         if (showPanels) {
           const { x, y } = projectToScreen(nodeAnchors[i], camera, width, height, worldPos);
-          applyFloating(panelRefs.current[i], x, y, 0.85, 1);
+          applyFloating(panelRefs.current[i], x, y, 1, 1);
+          const chrome = panelChromeRefs.current[i];
+          if (chrome) chrome.style.opacity = "0.85";
+          const content = panelContentRefs.current[i];
+          if (content) content.style.opacity = "0.95";
         }
       });
       growthCurveLine?.geometry.setDrawRange(0, 0);
@@ -1077,50 +1087,82 @@ export default function HeroScene({ sectionEl }: HeroSceneProps) {
       {/* Service node panels (always eligible, gated to md+ inside the JS
           loop via showPanels) */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-10 hidden md:block">
-        {SERVICE_NODES.map((node, i) => {
-          const Icon = node.icon;
-          return (
+        {SERVICE_NODES.map((node, i) => (
+          <div
+            key={node.label}
+            ref={(el) => {
+              panelRefs.current[i] = el;
+            }}
+            className="absolute left-0 top-0 w-[176px] opacity-0"
+            style={{ willChange: "transform, opacity" }}
+          >
+            {/* Glass chrome — dims independently of the label below so a
+                resting (already-visited) panel can fade into the
+                background without taking the text's legibility with it. */}
             <div
-              key={node.label}
               ref={(el) => {
-                panelRefs.current[i] = el;
+                panelChromeRefs.current[i] = el;
               }}
-              className="absolute left-0 top-0 w-[176px] rounded-2xl border border-white/15 bg-white/[0.06] p-3.5 opacity-0 backdrop-blur-md"
-              style={{ willChange: "transform, opacity" }}
+              aria-hidden
+              className="absolute inset-0 rounded-2xl border border-white/15 bg-white/[0.06] backdrop-blur-md"
+            />
+            <div
+              ref={(el) => {
+                panelContentRefs.current[i] = el;
+              }}
+              className="relative p-3.5"
             >
               <div
                 ref={(el) => {
                   iconWrapRefs.current[i] = el;
                 }}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary-bright/30 to-cyan-400/20 text-cyan-200 transition-shadow duration-300"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary-bright/30 to-cyan-400/20 transition-shadow duration-300"
               >
-                <Icon className="h-4 w-4" strokeWidth={2} />
+                <Image src={node.icon} alt="" width={24} height={24} className="h-6 w-6 object-contain" />
               </div>
-              <p className="mt-2.5 text-[13px] font-semibold leading-tight text-black">
+              <p className="mt-2.5 text-[13px] font-semibold leading-tight text-hero-white">
                 {node.label}
               </p>
-              <p className="mt-0.5 text-[11px] leading-snug text-black/55">
+              <p className="mt-0.5 text-[11px] leading-snug text-hero-white/70">
                 {node.tagline}
               </p>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
       {/* SEO keyword labels */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-10 hidden md:block">
-        {KEYWORD_ITEMS.map((item, i) => (
-          <div
-            key={item.text}
-            ref={(el) => {
-              keywordRefs.current[i] = el;
-            }}
-            className="absolute left-0 top-0 whitespace-nowrap rounded-full border border-cyan-300/25 bg-cyan-400/[0.08] px-3.5 py-1.5 text-[12px] font-medium text-black opacity-0 backdrop-blur-md"
-            style={{ willChange: "transform, opacity" }}
-          >
-            {item.text}
-          </div>
-        ))}
+        {KEYWORD_ITEMS.map((item, i) =>
+          item.image ? (
+            <div
+              key={item.text}
+              ref={(el) => {
+                keywordRefs.current[i] = el;
+              }}
+              className="absolute left-0 top-0 h-[70px] w-[104px] overflow-hidden rounded-xl border border-cyan-300/25 opacity-0 shadow-lg"
+              style={{ willChange: "transform, opacity" }}
+            >
+              <Image src={item.image} alt="" fill sizes="104px" className="object-cover" />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-2 pb-1 pt-3">
+                <span className="text-[10px] font-medium leading-tight text-hero-white">
+                  {item.text}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div
+              key={item.text}
+              ref={(el) => {
+                keywordRefs.current[i] = el;
+              }}
+              className="absolute left-0 top-0 whitespace-nowrap rounded-full border border-cyan-300/25 bg-cyan-400/[0.08] px-3.5 py-1.5 text-[12px] font-medium text-hero-white opacity-0 backdrop-blur-md"
+              style={{ willChange: "transform, opacity" }}
+            >
+              {item.text}
+            </div>
+          )
+        )}
       </div>
 
       {/* PPC campaign cards */}
@@ -1131,7 +1173,7 @@ export default function HeroScene({ sectionEl }: HeroSceneProps) {
             ref={(el) => {
               campaignRefs.current[i] = el;
             }}
-            className="absolute left-0 top-0 whitespace-nowrap rounded-xl border border-white/15 bg-white/[0.06] px-3.5 py-2 text-[12px] font-semibold text-black opacity-0 backdrop-blur-md"
+            className="absolute left-0 top-0 whitespace-nowrap rounded-xl border border-white/15 bg-white/[0.06] px-3.5 py-2 text-[12px] font-semibold text-hero-white opacity-0 backdrop-blur-md"
             style={{ willChange: "transform, opacity" }}
           >
             {item.text}
@@ -1141,43 +1183,65 @@ export default function HeroScene({ sectionEl }: HeroSceneProps) {
 
       {/* Creative frames */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-10 hidden md:block">
-        {CREATIVE_ITEMS.map((item, i) => (
-          <div
-            key={item.text}
-            ref={(el) => {
-              creativeRefs.current[i] = el;
-            }}
-            className="absolute left-0 top-0 flex h-[86px] w-[110px] flex-col items-center justify-center gap-1.5 rounded-xl border border-white/20 bg-white/[0.07] opacity-0 backdrop-blur-md"
-            style={{ willChange: "transform, opacity" }}
-          >
-            <FrameIcon className="h-4 w-4 text-cyan-200" strokeWidth={1.75} />
-            <span className="px-2 text-center text-[11px] font-medium leading-tight text-black/85">
-              {item.text}
-            </span>
-          </div>
-        ))}
+        {CREATIVE_ITEMS.map((item, i) =>
+          item.image ? (
+            <div
+              key={item.text}
+              ref={(el) => {
+                creativeRefs.current[i] = el;
+              }}
+              className="absolute left-0 top-0 h-[86px] w-[110px] overflow-hidden rounded-xl border border-white/20 opacity-0 shadow-lg"
+              style={{ willChange: "transform, opacity" }}
+            >
+              <Image src={item.image} alt="" fill sizes="110px" className="object-cover" />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-2 pb-1 pt-3">
+                <span className="text-[10px] font-medium leading-tight text-hero-white">
+                  {item.text}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div
+              key={item.text}
+              ref={(el) => {
+                creativeRefs.current[i] = el;
+              }}
+              className="absolute left-0 top-0 flex h-[86px] w-[110px] flex-col items-center justify-center gap-1.5 rounded-xl border border-white/20 bg-white/[0.07] opacity-0 backdrop-blur-md"
+              style={{ willChange: "transform, opacity" }}
+            >
+              <FrameIcon className="h-4 w-4 text-cyan-200" strokeWidth={1.75} />
+              <span className="px-2 text-center text-[11px] font-medium leading-tight text-hero-white/85">
+                {item.text}
+              </span>
+            </div>
+          )
+        )}
       </div>
 
       {/* Act copy */}
       <div className="pointer-events-none absolute inset-0 z-20">
         <div className="container-page relative h-full">
           {/* 0% — Intro */}
-          <div ref={introRef} className="absolute inset-0 flex items-start pt-28 md:pt-32 lg:pt-40">
-            <div className="max-w-xl">
-              <div className="mb-6 inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-white/[0.06] py-1.5 pl-1.5 pr-4 backdrop-blur-sm">
+          <div ref={introRef} className="absolute inset-0 flex items-start justify-center pt-28 md:pt-32 lg:pt-40">
+            <div className="mx-auto max-w-xl text-center">
+              <div className="mx-auto mb-6 inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-white/[0.06] px-1.5 py-1.5 backdrop-blur-sm">
                 <span className="inline-flex items-center rounded-full bg-primary px-2.5 py-1 text-[11px] font-semibold text-black">
                   Amazon Growth Agency
                 </span>
               </div>
-              <h1 className="text-[38px] font-black leading-[1.14] tracking-tight text-black sm:text-[46px] lg:text-[52px]">
+              <h1 className="text-[44px] font-black leading-[1.14] tracking-tight text-hero-white sm:text-[54px] lg:text-[60px]">
                 Built to Grow Brands on Amazon.
               </h1>
-              <p className="mt-6 max-w-lg text-[17px] leading-relaxed text-black">
+              <p className="mx-auto mt-6 max-w-lg text-[19px] leading-relaxed text-hero-white">
                 We combine strategy, data, creative, and performance
                 marketing to help Amazon brands scale profitably.
               </p>
-              <div className="mt-9 flex flex-wrap items-center gap-5">
-                <CTAButton href="#book-audit" arrow>
+              <div className="mt-9 flex flex-wrap items-center justify-center gap-5">
+                <CTAButton
+                  href="#book-audit"
+                  arrow
+                  className="hover:!bg-none hover:!bg-black hover:!brightness-100"
+                >
                   Get Your Growth Audit
                 </CTAButton>
                 <CTAButton href="#services" variant="outline-dark" arrow>
@@ -1190,19 +1254,12 @@ export default function HeroScene({ sectionEl }: HeroSceneProps) {
           {/* 20% — Amazon SEO */}
           <div ref={seoRef} className="absolute inset-0 flex items-start pt-28 opacity-0 md:pt-32 lg:pt-40">
             <div className="max-w-xl">
-              <span className="inline-flex items-center rounded-full border border-white/15 bg-white/[0.06] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-black/85 backdrop-blur-sm">
+              <span className="inline-flex items-center rounded-full border border-white/15 bg-white/[0.06] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-hero-white/85 backdrop-blur-sm">
                 Amazon SEO
               </span>
-              <div className="mt-7 flex items-baseline gap-3">
-                <span ref={rankingValueRef} className="text-[56px] font-black leading-none tracking-tight text-black">
-                  #47
-                </span>
-                <span className="text-[15px] font-medium text-black/70">
-                  conceptual ranking movement
-                </span>
-              </div>
-              <p className="mt-3 max-w-sm text-[12.5px] leading-relaxed text-black/50">
-                Illustrative ranking movement — not actual client results.
+              <p className="mt-7 max-w-sm text-[19px] leading-relaxed text-hero-white">
+                Keyword research, listing optimization, and search ranking
+                strategy to help your products get found.
               </p>
             </div>
           </div>
@@ -1210,18 +1267,18 @@ export default function HeroScene({ sectionEl }: HeroSceneProps) {
           {/* 40% — Amazon PPC */}
           <div ref={ppcRef} className="absolute inset-0 flex items-start pt-28 opacity-0 md:pt-32 lg:pt-40">
             <div className="max-w-xl">
-              <span className="inline-flex items-center rounded-full border border-white/15 bg-white/[0.06] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-black/85 backdrop-blur-sm">
+              <span className="inline-flex items-center rounded-full border border-white/15 bg-white/[0.06] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-hero-white/85 backdrop-blur-sm">
                 Amazon PPC
               </span>
-              <div className="mt-7 flex items-baseline gap-3">
-                <span ref={acosValueRef} className="text-[56px] font-black leading-none tracking-tight text-black">
+              <div className="mt-7 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <span ref={acosValueRef} className="text-[44px] font-black leading-none tracking-tight text-hero-white sm:text-[64px]">
                   42%
                 </span>
-                <span className="text-[15px] font-medium text-black/70">
+                <span className="text-[15px] font-medium text-hero-white/70 sm:text-[17px]">
                   conceptual ACoS optimization
                 </span>
               </div>
-              <p className="mt-3 max-w-sm text-[12.5px] leading-relaxed text-black/50">
+              <p className="mt-3 max-w-sm text-[13.5px] leading-relaxed text-hero-white/50">
                 Conceptual optimization curve — for illustration only.
               </p>
             </div>
@@ -1230,10 +1287,10 @@ export default function HeroScene({ sectionEl }: HeroSceneProps) {
           {/* 60% — Creative */}
           <div ref={creativeActRef} className="absolute inset-0 flex items-start pt-28 opacity-0 md:pt-32 lg:pt-40">
             <div className="max-w-xl">
-              <span className="inline-flex items-center rounded-full border border-white/15 bg-white/[0.06] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-black/85 backdrop-blur-sm">
+              <span className="inline-flex items-center rounded-full border border-white/15 bg-white/[0.06] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-hero-white/85 backdrop-blur-sm">
                 Creative &amp; Brand
               </span>
-              <p className="mt-6 max-w-sm text-[15px] leading-relaxed text-black/70">
+              <p className="mt-6 max-w-sm text-[17px] leading-relaxed text-hero-white/70">
                 Product imagery, A+ Content, Brand Story, and storefront
                 creative — assembled into one system.
               </p>
@@ -1243,10 +1300,10 @@ export default function HeroScene({ sectionEl }: HeroSceneProps) {
           {/* 80% — Account Management */}
           <div ref={accountRef} className="absolute inset-0 flex items-start pt-28 opacity-0 md:pt-32 lg:pt-40">
             <div className="max-w-xl">
-              <span className="inline-flex items-center rounded-full border border-white/15 bg-white/[0.06] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-black/85 backdrop-blur-sm">
+              <span className="inline-flex items-center rounded-full border border-white/15 bg-white/[0.06] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-hero-white/85 backdrop-blur-sm">
                 Account Management
               </span>
-              <p className="mt-6 max-w-sm text-[15px] leading-relaxed text-black/70">
+              <p className="mt-6 max-w-sm text-[17px] leading-relaxed text-hero-white/70">
                 SEO · PPC · Creative · Listing · Analytics — one connected
                 system, one accountable team.
               </p>
@@ -1256,10 +1313,10 @@ export default function HeroScene({ sectionEl }: HeroSceneProps) {
           {/* 100% — Growth */}
           <div ref={growthRef} className="absolute inset-0 flex items-start pt-28 opacity-0 md:pt-32 lg:pt-40">
             <div className="max-w-xl">
-              <h2 className="text-[34px] font-black leading-[1.14] tracking-tight text-black sm:text-[42px] lg:text-[48px]">
+              <h2 className="text-[40px] font-black leading-[1.14] tracking-tight text-hero-white sm:text-[50px] lg:text-[56px]">
                 One Team. Every Amazon Growth Layer.
               </h2>
-              <p className="mt-6 max-w-lg text-[17px] leading-relaxed text-black">
+              <p className="mt-6 max-w-lg text-[19px] leading-relaxed text-hero-white">
                 Strategy, SEO, PPC, creative, and account management working
                 together to move your brand forward.
               </p>

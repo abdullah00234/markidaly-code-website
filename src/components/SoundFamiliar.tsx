@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import Eyebrow from "./ui/Eyebrow";
 import CTAButton from "./ui/CTAButton";
-import ConnectedSystemVisual from "./ui/ConnectedSystemVisual";
+import ConnectedEcosystemVisual from "./ui/ConnectedEcosystemVisual";
 import { EASE_PREMIUM, staggerContainer } from "@/lib/motion";
 
 type PainPoint = {
@@ -210,7 +210,7 @@ export default function SoundFamiliar() {
                   variants={cardReveal}
                   className="group relative flex items-center gap-4 rounded-2xl border border-line bg-white/80 px-4 py-5 shadow-[0_1px_2px_rgba(11,31,58,0.04)] backdrop-blur-sm transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:border-primary/30 hover:bg-white hover:shadow-[0_16px_36px_-16px_rgba(31,94,255,0.28)] sm:gap-5 sm:px-5 sm:py-6"
                 >
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-light text-primary transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105 group-hover:text-black group-hover:shadow-[0_10px_22px_-8px_rgba(31,94,255,0.35)]">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-light text-[#1c8bc2] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105 group-hover:text-black group-hover:shadow-[0_10px_22px_-8px_rgba(31,94,255,0.35)]">
                     <Icon aria-hidden strokeWidth={1.6} className="h-5 w-5" />
                   </span>
                   <div className="min-w-0 flex-1">
@@ -241,31 +241,17 @@ export default function SoundFamiliar() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 0.8, ease: EASE_PREMIUM, delay: 0.1 }}
-            className="relative overflow-hidden rounded-[32px] border border-white/10 bg-gradient-hero px-6 py-10 shadow-[0_1px_2px_rgba(11,31,58,0.06),0_28px_56px_-20px_rgba(11,31,58,0.45)] sm:px-8"
+            className="relative overflow-hidden rounded-[32px] border border-white/10 bg-gradient-hero px-6 py-8 shadow-[0_1px_2px_rgba(11,31,58,0.05),0_28px_56px_-24px_rgba(31,94,255,0.18)] sm:px-8 sm:py-9"
           >
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-0 opacity-[0.05]"
-              style={{
-                backgroundImage:
-                  "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
-                backgroundSize: "48px 48px",
-              }}
+              className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-primary-bright/20 blur-[70px]"
             />
-
-            <div className="absolute right-5 top-5 z-10 hidden items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1.5 backdrop-blur-sm sm:flex">
-              <span className="h-1.5 w-1.5 rounded-full bg-gold" />
-              <span className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-white/70">
-                Fully Connected
-              </span>
-            </div>
-
-            <motion.div
-              animate={animateIdle ? { y: [0, -8, 0] } : undefined}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <ConnectedSystemVisual className="relative mx-auto w-full max-w-[400px]" />
-            </motion.div>
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-gold/[0.12] blur-[70px]"
+            />
+            <ConnectedEcosystemVisual className="relative" />
           </motion.div>
         </div>
 
@@ -302,7 +288,7 @@ export default function SoundFamiliar() {
                 key={b.title}
                 className="group flex items-start gap-3 bg-white px-6 py-7 transition-colors duration-300 hover:bg-primary-light/40 lg:px-7"
               >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-light text-primary transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105 group-hover:bg-gradient-brand group-hover:text-white group-hover:shadow-[0_8px_18px_-6px_rgba(31,94,255,0.5)]">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-light text-primary transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105 group-hover:bg-gradient-brand group-hover:text-black group-hover:shadow-[0_8px_18px_-6px_rgba(31,94,255,0.5)]">
                   <Icon aria-hidden strokeWidth={1.8} className="h-[17px] w-[17px]" />
                 </span>
                 <div>
