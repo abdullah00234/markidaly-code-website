@@ -80,7 +80,7 @@ export default function ProvenPerformance() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.4 }}
                 transition={{ duration: 0.6, ease: EASE_PREMIUM, delay: 0.25 }}
-                className="relative z-20 mt-6 lg:absolute lg:-left-8 lg:top-10 lg:mt-0 xl:-left-14"
+                className="relative z-20 mt-6 2xl:absolute 2xl:-left-[180px] 2xl:top-8 2xl:mt-0"
               >
                 <CategoriesCard />
               </motion.div>
@@ -90,7 +90,7 @@ export default function ProvenPerformance() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.4 }}
                 transition={{ duration: 0.6, ease: EASE_PREMIUM, delay: 0.35 }}
-                className="relative z-20 mt-6 lg:absolute lg:-right-6 lg:bottom-4 lg:mt-0 xl:-right-12"
+                className="relative z-20 mt-6 2xl:absolute 2xl:-right-[180px] 2xl:bottom-6 2xl:mt-0"
               >
                 <GrowthResultCard />
               </motion.div>

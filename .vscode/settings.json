@@ -1,0 +1,13 @@
+{
+  "files.watcherExclude": {
+    "**/.next/**": true,
+    "**/.netlify/**": true
+  },
+  "search.exclude": {
+    "**/.next": true,
+    "**/.netlify": true
+  },
+  "files.exclude": {
+    "**/.next": true
+  }
+}

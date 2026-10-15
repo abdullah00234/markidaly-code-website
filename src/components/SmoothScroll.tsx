@@ -2,11 +2,21 @@
 
 import { useEffect } from "react";
 import { ReactLenis, useLenis } from "lenis/react";
+import type Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
+}
+
+declare global {
+  interface Window {
+    // Lenis itself owns `window.lenis` (devtools metadata) — this holds the
+    // actual instance for components outside the provider tree to drive
+    // scroll position programmatically (see OurProcess.tsx's click-to-jump).
+    __lenisInstance?: Lenis;
+  }
 }
 
 // Bridges Lenis's smooth scroll to GSAP ScrollTrigger so scrubbed/pinned
@@ -21,9 +31,11 @@ function LenisScrollTriggerBridge() {
     const tick = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
+    window.__lenisInstance = lenis;
     return () => {
       gsap.ticker.remove(tick);
       lenis.off("scroll", ScrollTrigger.update);
+      delete window.__lenisInstance;
     };
   }, [lenis]);
 
