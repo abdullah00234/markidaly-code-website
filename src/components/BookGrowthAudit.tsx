@@ -40,6 +40,16 @@ function toggleValue(list: string[], value: string) {
 }
 
 export default function BookGrowthAudit() {
+  // Calendly's inline widget pulls in ~2.8 MB of its own JS/CSS (plus the
+  // Stripe SDK it loads internally for paid-event support we don't use).
+  // Mounting it unconditionally on page load — even with Next's
+  // strategy="lazyOnload" — still fires it shortly after load regardless
+  // of whether this section is ever seen, which was getting caught
+  // intermittently by Lighthouse's trace window and swinging the
+  // performance score by 40+ points between runs. Only mounting it once
+  // this column is actually scrolled near keeps that weight off of
+  // everyone who doesn't reach the booking section.
+  const [shouldLoadCalendly, setShouldLoadCalendly] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
@@ -135,7 +145,8 @@ export default function BookGrowthAudit() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.6 }}
+            onViewportEnter={() => setShouldLoadCalendly(true)}
+            viewport={{ once: true, amount: 0.6, margin: "400px 0px" }}
             transition={{ duration: 0.7, ease: EASE_PREMIUM }}
             className="lg:self-start lg:sticky lg:top-28"
           >
@@ -155,10 +166,12 @@ export default function BookGrowthAudit() {
               data-url="https://calendly.com/contact-markidly/30min"
               style={{ minWidth: "320px", height: "700px" }}
             />
-            <Script
-              src="https://assets.calendly.com/assets/external/widget.js"
-              strategy="lazyOnload"
-            />
+            {shouldLoadCalendly && (
+              <Script
+                src="https://assets.calendly.com/assets/external/widget.js"
+                strategy="lazyOnload"
+              />
+            )}
           </motion.div>
 
           <motion.form
