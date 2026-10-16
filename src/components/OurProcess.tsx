@@ -1,11 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CadenceScroll } from "./ui/cadence-scroll";
-import { GradientWave } from "./ui/gradient-wave";
 import Eyebrow from "./ui/Eyebrow";
+
+// Hand-rolled WebGL shader (~750 lines) that only paints a decorative
+// background — no text/SEO content — so it's split out of the main bundle
+// and skipped entirely for SSR, same pattern as the hero's 3D scene.
+const GradientWave = dynamic(
+  () => import("./ui/gradient-wave").then((m) => m.GradientWave),
+  { ssr: false }
+);
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
