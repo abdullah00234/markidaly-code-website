@@ -1,0 +1,14 @@
+# Platform-level rate limiting for the growth-audit form endpoint, enforced
+# at Netlify's edge before the request reaches the Next.js API route. This
+# is durable across serverless cold starts (unlike an in-memory counter in
+# the route handler) and needs no external store — see src/app/api/growth-audit/route.ts
+# for the in-route defense-in-depth (body size cap, validation).
+[[redirects]]
+  from = "/api/growth-audit"
+  to = "/api/growth-audit"
+  status = 200
+  force = true
+  [redirects.rate_limit]
+    window_limit = 5
+    window_size = 60
+    aggregate_by = ["ip"]

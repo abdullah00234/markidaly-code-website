@@ -1,6 +1,15 @@
 "use client";
 
 import { useCallback, useEffect } from "react";
+import Script from "next/script";
+import { useMediaQuery } from "@/lib/use-media-query";
+
+// SRI hash for the exact pinned version below (sha384, computed from the
+// file actually served at this URL) — verifies the CDN script hasn't been
+// tampered with before it runs.
+const PARTICLES_SRC = "https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js";
+const PARTICLES_INTEGRITY =
+  "sha384-d+UOwmNNIC7V4izkTAKSXzWhjC2GxiS9PTykO1XdOPC3nc2z65UOS7SP6QdKPA70";
 
 // particles.js attaches itself to `window` when loaded from the CDN script
 // below — there's no npm type package for it, so only the surface this file
@@ -31,6 +40,8 @@ function destroyExisting() {
 }
 
 export default function ParticlesBackground() {
+  const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+
   const initParticles = useCallback(() => {
     destroyExisting();
 
@@ -74,23 +85,26 @@ export default function ParticlesBackground() {
     });
   }, []);
 
+  // next/script's onReady fires once the script is loaded, including on
+  // mount if some other instance already loaded it — no need to also check
+  // window.particlesJS here.
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    if (window.particlesJS) {
-      initParticles();
-      return () => destroyExisting();
-    }
-
-    const script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js";
-    script.async = true;
-    script.onload = () => initParticles();
-    document.body.appendChild(script);
-
+    if (prefersReducedMotion) return;
     return () => destroyExisting();
-  }, [initParticles]);
+  }, [prefersReducedMotion]);
 
-  return <div id="particles-why" aria-hidden className="absolute inset-0" />;
+  return (
+    <>
+      <div id="particles-why" aria-hidden className="absolute inset-0" />
+      {!prefersReducedMotion && (
+        <Script
+          src={PARTICLES_SRC}
+          integrity={PARTICLES_INTEGRITY}
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+          onReady={initParticles}
+        />
+      )}
+    </>
+  );
 }

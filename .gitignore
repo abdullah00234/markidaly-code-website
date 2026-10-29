@@ -31,3 +31,8 @@ next-env.d.ts
 
 # Local Netlify folder
 .netlify
+
+# Unreferenced scratch assets moved out during the Oct 2026 audit cleanup —
+# reviewed, confirmed unused, kept locally pending deletion. See the audit
+# fix report for what's in here and why.
+/_unused-assets-backup

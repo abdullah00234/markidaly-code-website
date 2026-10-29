@@ -4,7 +4,15 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Image as FrameIcon } from "lucide-react";
+import {
+  Image as FrameIcon,
+  Search,
+  Target,
+  MousePointerClick,
+  LayoutDashboard,
+  TrendingUp,
+  type LucideIcon,
+} from "lucide-react";
 import Image from "next/image";
 import CTAButton from "../ui/CTAButton";
 // The Markidly mark — imported (not moved into public/) so this is the
@@ -31,12 +39,16 @@ const BRAND = {
 
 type HeroSceneProps = {
   sectionEl: HTMLElement | null;
+  // Owned by Hero.tsx (server-rendered there) so the hero <h1> ends up in
+  // the server-rendered HTML even though this component is client-only —
+  // see Hero.tsx for why. Driven the same way a locally-owned ref would be.
+  introRef: React.RefObject<HTMLDivElement | null>;
 };
 
 type ServiceNode = {
   label: string;
   tagline: string;
-  icon: string;
+  icon: LucideIcon;
   x: number;
   y: number;
   z: number;
@@ -52,12 +64,12 @@ type ServiceNode = {
 // or marketplace UI. Positions stay right-of-core so nodes never drift into
 // the copy column.
 const SERVICE_NODES: ServiceNode[] = [
-  { label: "Amazon SEO", tagline: "Rank higher, sell more", icon: "/images/hero-icons/seo.png", x: -5.5, y: 5.5, z: 1.5, revealStart: 0.02, revealEnd: 0.16 },
-  { label: "Amazon PPC", tagline: "Profitable ad spend", icon: "/images/hero-icons/ppc.png", x: 6, y: 6.5, z: -1, revealStart: 0.22, revealEnd: 0.36 },
-  { label: "Listing Optimization", tagline: "Convert more browsers", icon: "/images/hero-icons/listing-optimization.png", x: 8, y: 0, z: 1, revealStart: 0.63, revealEnd: 0.75 },
-  { label: "Creative & A+ Content", tagline: "Brand Story that sells", icon: "/images/hero-icons/creative.png", x: 7.5, y: -5.5, z: 0.5, revealStart: 0.42, revealEnd: 0.56 },
-  { label: "Account Management", tagline: "Health, ops, compliance", icon: "/images/hero-icons/account-management.png", x: -2, y: -6, z: -1.5, revealStart: 0.63, revealEnd: 0.75 },
-  { label: "Growth Strategy", tagline: "One plan, one team", icon: "/images/hero-icons/growth.png", x: -8, y: 0.5, z: -3, revealStart: 0.63, revealEnd: 0.75 },
+  { label: "Amazon SEO", tagline: "Rank higher, sell more", icon: Search, x: -5.5, y: 5.5, z: 1.5, revealStart: 0.02, revealEnd: 0.16 },
+  { label: "Amazon PPC", tagline: "Profitable ad spend", icon: Target, x: 6, y: 6.5, z: -1, revealStart: 0.22, revealEnd: 0.36 },
+  { label: "Listing Optimization", tagline: "Convert more browsers", icon: MousePointerClick, x: 8, y: 0, z: 1, revealStart: 0.63, revealEnd: 0.75 },
+  { label: "Creative & A+ Content", tagline: "Brand Story that sells", icon: FrameIcon, x: 7.5, y: -5.5, z: 0.5, revealStart: 0.42, revealEnd: 0.56 },
+  { label: "Account Management", tagline: "Health, ops, compliance", icon: LayoutDashboard, x: -2, y: -6, z: -1.5, revealStart: 0.63, revealEnd: 0.75 },
+  { label: "Growth Strategy", tagline: "One plan, one team", icon: TrendingUp, x: -8, y: 0.5, z: -3, revealStart: 0.63, revealEnd: 0.75 },
 ];
 
 // Abstract SEO data labels — never a real keyword tool or ranking dashboard.
@@ -66,11 +78,11 @@ const SERVICE_NODES: ServiceNode[] = [
 // projections stay clear of each other and of the SEO service panel instead
 // of clustering along the same ray from the node.
 const KEYWORD_ITEMS: { text: string; x: number; y: number; z: number; image?: string }[] = [
-  { text: "Keyword Research", x: -10.5, y: 10.5, z: 3, image: "/images/hero-keyword-research.png" },
-  { text: "Search Strategy", x: -0.5, y: 11, z: -0.5, image: "/images/hero-search-strategy.png" },
-  { text: "Ranking Signals", x: -12.5, y: 4.5, z: -1, image: "/images/hero-ranking-signals.png" },
+  { text: "Keyword Research", x: -10.5, y: 10.5, z: 3 },
+  { text: "Search Strategy", x: -0.5, y: 11, z: -0.5 },
+  { text: "Ranking Signals", x: -12.5, y: 4.5, z: -1 },
   { text: "Competitor Analysis", x: -1.5, y: 1, z: 4.5 },
-  { text: "Content Optimization", x: -7.5, y: -0.5, z: 6, image: "/images/hero-content-optimization.png" },
+  { text: "Content Optimization", x: -7.5, y: -0.5, z: 6 },
 ];
 
 // Abstract PPC campaign cards — conceptual, not a real ads dashboard.
@@ -93,11 +105,11 @@ const CREATIVE_ITEMS: {
   scatter: [number, number, number];
   image?: string;
 }[] = [
-  { text: "Product Images", grid: [12, -8.5, 2], scatter: [5.5, -3.5, 8.5], image: "/images/hero-product-listing.png" },
-  { text: "A+ Content", grid: [17, -8.5, 2], scatter: [22.5, -2.5, -3.5], image: "/images/hero-aplus-content.png" },
-  { text: "Brand Story", grid: [12, -13, 2], scatter: [4.5, -16.5, 7.5], image: "/images/hero-brand-story.png" },
-  { text: "Storefront", grid: [17, -13, 2], scatter: [23.5, -15.5, -4.5], image: "/images/hero-storefront.png" },
-  { text: "Listing Creative", grid: [14.5, -16, 3.5], scatter: [10.5, -19.5, 9.5], image: "/images/hero-listing-creative.png" },
+  { text: "Product Images", grid: [12, -8.5, 2], scatter: [5.5, -3.5, 8.5] },
+  { text: "A+ Content", grid: [17, -8.5, 2], scatter: [22.5, -2.5, -3.5] },
+  { text: "Brand Story", grid: [12, -13, 2], scatter: [4.5, -16.5, 7.5] },
+  { text: "Storefront", grid: [17, -13, 2], scatter: [23.5, -15.5, -4.5] },
+  { text: "Listing Creative", grid: [14.5, -16, 3.5], scatter: [10.5, -19.5, 9.5] },
 ];
 
 const ACOS_STEPS = ["42%", "31%", "22%", "15%"];
@@ -250,7 +262,7 @@ function isWebGLAvailable(): boolean {
  * particles along an already-established connection — both "system is
  * alive" cues, not decoration.
  */
-export default function HeroScene({ sectionEl }: HeroSceneProps) {
+export default function HeroScene({ sectionEl, introRef }: HeroSceneProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -262,7 +274,6 @@ export default function HeroScene({ sectionEl }: HeroSceneProps) {
   const campaignRefs = useRef<(HTMLDivElement | null)[]>([]);
   const creativeRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  const introRef = useRef<HTMLDivElement>(null);
   const seoRef = useRef<HTMLDivElement>(null);
   const ppcRef = useRef<HTMLDivElement>(null);
   const creativeActRef = useRef<HTMLDivElement>(null);
@@ -1118,7 +1129,7 @@ export default function HeroScene({ sectionEl }: HeroSceneProps) {
                 }}
                 className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary-bright/30 to-cyan-400/20 transition-shadow duration-300"
               >
-                <Image src={node.icon} alt="" width={24} height={24} className="h-6 w-6 object-contain" />
+                <node.icon className="h-5 w-5 text-hero-white" strokeWidth={1.75} />
               </div>
               <p className="mt-2.5 text-[13px] font-semibold leading-tight text-hero-white">
                 {node.label}
@@ -1218,39 +1229,10 @@ export default function HeroScene({ sectionEl }: HeroSceneProps) {
         )}
       </div>
 
-      {/* Act copy */}
+      {/* Act copy (intro copy itself is server-rendered in Hero.tsx — this
+          component only drives its fade/position via introRef) */}
       <div className="pointer-events-none absolute inset-0 z-20">
         <div className="container-page relative h-full">
-          {/* 0% — Intro */}
-          <div ref={introRef} className="absolute inset-0 flex items-start justify-center pt-28 md:pt-32 lg:pt-40">
-            <div className="mx-auto max-w-xl text-center">
-              <div className="mx-auto mb-6 inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-white/[0.06] px-1.5 py-1.5 backdrop-blur-sm">
-                <span className="inline-flex items-center rounded-full bg-primary px-2.5 py-1 text-[11px] font-semibold text-black">
-                  Amazon Growth Agency
-                </span>
-              </div>
-              <h1 className="text-[44px] font-black leading-[1.14] tracking-tight text-hero-white sm:text-[54px] lg:text-[60px]">
-                Built to Grow Brands on Amazon.
-              </h1>
-              <p className="mx-auto mt-6 max-w-lg text-[19px] leading-relaxed text-hero-white">
-                We combine strategy, data, creative, and performance
-                marketing to help Amazon brands scale profitably.
-              </p>
-              <div className="mt-9 flex flex-wrap items-center justify-center gap-5">
-                <CTAButton
-                  href="#book-audit"
-                  arrow
-                  className="hover:!bg-none hover:!bg-black hover:!brightness-100"
-                >
-                  Get Your Growth Audit
-                </CTAButton>
-                <CTAButton href="#services" variant="outline-dark" arrow>
-                  Explore Services
-                </CTAButton>
-              </div>
-            </div>
-          </div>
-
           {/* 20% — Amazon SEO */}
           <div ref={seoRef} className="absolute inset-0 flex items-start pt-28 opacity-0 md:pt-32 lg:pt-40">
             <div className="max-w-xl">

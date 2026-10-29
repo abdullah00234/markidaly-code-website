@@ -39,6 +39,12 @@ function toggleValue(list: string[], value: string) {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
 }
 
+// Checkbox/label ids must be valid HTML5 ids (no spaces) — slugify the
+// option text instead of using it verbatim.
+function slugify(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
 export default function BookGrowthAudit() {
   // Calendly's inline widget pulls in ~2.8 MB of its own JS/CSS (plus the
   // Stripe SDK it loads internally for paid-event support we don't use).
@@ -191,12 +197,14 @@ export default function BookGrowthAudit() {
                     <Input
                       id="name"
                       value={name}
+                      aria-invalid={!!errors.name}
+                      aria-describedby={errors.name ? "name-error" : undefined}
                       onChange={(e) => {
                         setName(e.target.value);
                         clearError("name");
                       }}
                     />
-                    <FieldError>{errors.name}</FieldError>
+                    <FieldError id="name-error">{errors.name}</FieldError>
                   </FieldContent>
                 </Field>
                 <Field>
@@ -206,12 +214,14 @@ export default function BookGrowthAudit() {
                       id="email"
                       type="email"
                       value={email}
+                      aria-invalid={!!errors.email}
+                      aria-describedby={errors.email ? "email-error" : undefined}
                       onChange={(e) => {
                         setEmail(e.target.value);
                         clearError("email");
                       }}
                     />
-                    <FieldError>{errors.email}</FieldError>
+                    <FieldError id="email-error">{errors.email}</FieldError>
                   </FieldContent>
                 </Field>
                 <Field>
@@ -220,12 +230,14 @@ export default function BookGrowthAudit() {
                     <Input
                       id="company"
                       value={company}
+                      aria-invalid={!!errors.company}
+                      aria-describedby={errors.company ? "company-error" : undefined}
                       onChange={(e) => {
                         setCompany(e.target.value);
                         clearError("company");
                       }}
                     />
-                    <FieldError>{errors.company}</FieldError>
+                    <FieldError id="company-error">{errors.company}</FieldError>
                   </FieldContent>
                 </Field>
                 <Field>
@@ -234,12 +246,14 @@ export default function BookGrowthAudit() {
                     <Input
                       id="website"
                       value={website}
+                      aria-invalid={!!errors.website}
+                      aria-describedby={errors.website ? "website-error" : undefined}
                       onChange={(e) => {
                         setWebsite(e.target.value);
                         clearError("website");
                       }}
                     />
-                    <FieldError>{errors.website}</FieldError>
+                    <FieldError id="website-error">{errors.website}</FieldError>
                   </FieldContent>
                 </Field>
               </div>
@@ -250,57 +264,65 @@ export default function BookGrowthAudit() {
                   <Input
                     id="revenue"
                     value={revenueRange}
+                    aria-invalid={!!errors.revenueRange}
+                    aria-describedby={errors.revenueRange ? "revenue-error" : undefined}
                     onChange={(e) => {
                       setRevenueRange(e.target.value);
                       clearError("revenueRange");
                     }}
                   />
-                  <FieldError>{errors.revenueRange}</FieldError>
+                  <FieldError id="revenue-error">{errors.revenueRange}</FieldError>
                 </FieldContent>
               </Field>
 
-              <FieldSet>
+              <FieldSet
+                aria-invalid={!!errors.helpNeeded}
+                aria-describedby={errors.helpNeeded ? "help-needed-error" : undefined}
+              >
                 <FieldLegend>What do you need help with?</FieldLegend>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {HELP_OPTIONS.map((option) => (
                     <Field key={option} className="flex-row items-center gap-2.5">
                       <Checkbox
-                        id={`help-${option}`}
+                        id={`help-${slugify(option)}`}
                         checked={helpNeeded.includes(option)}
                         onCheckedChange={() => {
                           setHelpNeeded((prev) => toggleValue(prev, option));
                           clearError("helpNeeded");
                         }}
                       />
-                      <FieldLabel htmlFor={`help-${option}`} className="font-normal">
+                      <FieldLabel htmlFor={`help-${slugify(option)}`} className="font-normal">
                         {option}
                       </FieldLabel>
                     </Field>
                   ))}
                 </div>
-                <FieldError>{errors.helpNeeded}</FieldError>
+                <FieldError id="help-needed-error">{errors.helpNeeded}</FieldError>
               </FieldSet>
 
-              <FieldSet>
+              <FieldSet
+                aria-invalid={!!errors.markets}
+                aria-describedby={errors.markets ? "markets-error" : undefined}
+              >
                 <FieldLegend>Target Market(s)</FieldLegend>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                   {MARKET_OPTIONS.map((option) => (
                     <Field key={option} className="flex-row items-center gap-2.5">
                       <Checkbox
-                        id={`market-${option}`}
+                        id={`market-${slugify(option)}`}
                         checked={markets.includes(option)}
                         onCheckedChange={() => {
                           setMarkets((prev) => toggleValue(prev, option));
                           clearError("markets");
                         }}
                       />
-                      <FieldLabel htmlFor={`market-${option}`} className="font-normal">
+                      <FieldLabel htmlFor={`market-${slugify(option)}`} className="font-normal">
                         {option}
                       </FieldLabel>
                     </Field>
                   ))}
                 </div>
-                <FieldError>{errors.markets}</FieldError>
+                <FieldError id="markets-error">{errors.markets}</FieldError>
               </FieldSet>
 
               <Field>

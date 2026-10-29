@@ -3,7 +3,6 @@
 import { motion } from "motion/react";
 import { Check } from "lucide-react";
 import CTAButton from "./ui/CTAButton";
-import { MeshGradient } from "./ui/mesh-gradient";
 import { EASE_PREMIUM, staggerContainer } from "@/lib/motion";
 
 const highlights = [
@@ -21,21 +20,26 @@ const itemVariants = {
 export default function FinalCTA() {
   return (
     <section id="contact" className="relative overflow-hidden bg-gradient-hero-dark py-28 lg:py-36">
-      <div aria-hidden className="pointer-events-none absolute inset-0 opacity-70">
-        <MeshGradient
-          className="h-full w-full"
-          colors={["#0b1f3a", "#0c78b8", "#1793c6", "#4c86ff"]}
-          speed={0.3}
-          distortion={0.9}
-          swirl={0.5}
-          swirlIterations={7}
-          softness={1}
-          shape="wave"
-          shapeScale={0.8}
-          scale={1.6}
-          rotation={135}
-        />
-      </div>
+      {/* Smooth CSS-only glow: a controlled medium-blue wash on the left that
+          fades gradually into the section's dark navy base toward the right.
+          Replaces a prior WebGL grain-shader overlay that read as excessive,
+          uneven noise rather than a premium gradient. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(115deg, rgba(23,147,198,0.55) 0%, rgba(12,120,184,0.38) 20%, rgba(11,31,58,0.18) 48%, rgba(6,15,31,0) 72%)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(60% 80% at 15% 20%, rgba(76,134,255,0.35) 0%, transparent 65%)",
+        }}
+      />
       <motion.div
         aria-hidden
         className="pointer-events-none absolute -bottom-40 left-1/2 h-[420px] w-[820px] -translate-x-1/2 rounded-full bg-[#1793C6]/20 blur-[120px]"

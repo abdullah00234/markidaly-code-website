@@ -16,7 +16,7 @@ const SERVICES_LINKS = [
 ].map((label) => ({ label, href: "#services" }));
 
 const COMPANY_LINKS = [
-  { label: "Our Approach", href: "#how-we-work" },
+  { label: "Our Approach", href: "#our-process" },
   { label: "About", href: "#about" },
   { label: "Case Studies", href: "#case-studies" },
   { label: "Contact", href: "#book-audit" },

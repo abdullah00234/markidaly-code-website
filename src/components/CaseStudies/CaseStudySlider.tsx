@@ -2,7 +2,8 @@
 
 import { useRef, useState } from "react";
 import { AnimatePresence, motion, type Variants } from "motion/react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
+import { useMediaQuery } from "@/lib/use-media-query";
 import { EASE_PREMIUM } from "@/lib/motion";
 import CaseStudySlide from "./CaseStudySlide";
 import CaseStudiesCTA from "./CaseStudiesCTA";
@@ -27,7 +28,14 @@ export default function CaseStudySlider() {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
+  const [userPaused, setUserPaused] = useState(false);
   const touchStartX = useRef<number | null>(null);
+  const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  // WCAG 2.2.2: auto-advancing content needs a way to pause it that isn't
+  // only "hover the mouse over it" (no keyboard/touch equivalent) — the
+  // explicit button below covers that. A reduced-motion preference goes
+  // further and disables autoplay outright until the visitor opts back in.
+  const autoplayPaused = isPaused || userPaused || prefersReducedMotion;
 
   const total = CASE_STUDY_SLIDES.length;
 
@@ -102,14 +110,14 @@ export default function CaseStudySlider() {
                     <div
                       key={`${index}-fill`}
                       onAnimationEnd={() => {
-                        if (!isPaused) goNext();
+                        if (!autoplayPaused) goNext();
                       }}
                       style={{
                         animationName: "case-progress",
                         animationDuration: `${AUTOPLAY_SECONDS}s`,
                         animationTimingFunction: "linear",
                         animationFillMode: "forwards",
-                        animationPlayState: isPaused ? "paused" : "running",
+                        animationPlayState: autoplayPaused ? "paused" : "running",
                       }}
                       className="h-full w-full origin-left bg-primary"
                     />
@@ -119,8 +127,19 @@ export default function CaseStudySlider() {
             </div>
           </div>
 
-          {/* Spacer to balance the arrow cluster and keep the counter centered */}
-          <div className="w-[76px] shrink-0" aria-hidden />
+          <button
+            type="button"
+            onClick={() => setUserPaused((v) => !v)}
+            aria-label={userPaused ? "Resume autoplay" : "Pause autoplay"}
+            aria-pressed={userPaused}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 text-white/70 transition-all duration-300 hover:border-white/40 hover:bg-white/10 hover:text-white"
+          >
+            {userPaused ? (
+              <Play className="h-[16px] w-[16px]" strokeWidth={2} />
+            ) : (
+              <Pause className="h-[16px] w-[16px]" strokeWidth={2} />
+            )}
+          </button>
         </div>
 
         <CaseStudiesCTA />

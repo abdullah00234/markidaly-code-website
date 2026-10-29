@@ -1,19 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SlidersHorizontal, TrendingUp } from "lucide-react";
 import { CadenceScroll } from "./ui/cadence-scroll";
 import Eyebrow from "./ui/Eyebrow";
-
-// Hand-rolled WebGL shader (~750 lines) that only paints a decorative
-// background — no text/SEO content — so it's split out of the main bundle
-// and skipped entirely for SSR, same pattern as the hero's 3D scene.
-const GradientWave = dynamic(
-  () => import("./ui/gradient-wave").then((m) => m.GradientWave),
-  { ssr: false }
-);
+import { GradientWave } from "./ui/gradient-wave";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -31,7 +24,8 @@ const phases = {
       title: "Prioritize",
       description:
         "Focus on the highest-impact opportunities across advertising, listings, operations, and profitability.",
-      media: "/images/prioritize-illustration.png",
+      icon: SlidersHorizontal,
+      gradient: "linear-gradient(135deg, #1f5eff, #0b1f3a)",
     },
     {
       title: "Execute",
@@ -49,7 +43,8 @@ const phases = {
       title: "Scale",
       description:
         "Once the foundation is strong, we help you scale sustainably with a proven, repeatable growth system.",
-      media: "/images/scale-illustration.png",
+      icon: TrendingUp,
+      gradient: "linear-gradient(135deg, #16294a, #1646c9)",
     },
   ],
 };
@@ -164,7 +159,7 @@ export default function OurProcess() {
             Every account moves through the same five steps.
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-white/60">
-            A clear, repeatable system — from diagnosing what's holding you
+            A clear, repeatable system — from diagnosing what&apos;s holding you
             back to scaling what works.
           </p>
         </div>

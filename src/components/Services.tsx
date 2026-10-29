@@ -35,7 +35,6 @@ const SERVICES: {
     ],
     icon: LayoutDashboard,
     gradient: "linear-gradient(135deg, #1f5eff, #0b1f3a)",
-    image: "/images/amazon-account-management.png",
   },
   {
     title: "Amazon PPC Management",
@@ -46,7 +45,6 @@ const SERVICES: {
     ],
     icon: Target,
     gradient: "linear-gradient(135deg, #4c86ff, #16294a)",
-    image: "/images/amazon-ppc-management.png",
   },
   {
     title: "Amazon Listing Optimization & CRO",
@@ -57,7 +55,6 @@ const SERVICES: {
     ],
     icon: Search,
     gradient: "linear-gradient(135deg, #1646c9, #1f5eff)",
-    image: "/images/amazon-listing-optimization.png",
   },
   {
     title: "Storefront & Brand Experience",
@@ -68,7 +65,6 @@ const SERVICES: {
     ],
     icon: Store,
     gradient: "linear-gradient(135deg, #1793c6, #0b1f3a)",
-    image: "/images/storefront-brand-experience.png",
   },
   {
     title: "Product Launch & Ranking",
@@ -79,7 +75,6 @@ const SERVICES: {
     ],
     icon: Rocket,
     gradient: "linear-gradient(135deg, #1f5eff, #4c86ff)",
-    image: "/images/product-launch-ranking.png",
   },
   {
     title: "Inventory, Operations & Account Health",
@@ -90,7 +85,6 @@ const SERVICES: {
     ],
     icon: PackageCheck,
     gradient: "linear-gradient(135deg, #16294a, #1646c9)",
-    image: "/images/inventory-operations-account-health.png",
   },
   {
     title: "Marketplace Expansion",
@@ -101,7 +95,6 @@ const SERVICES: {
     ],
     icon: Globe,
     gradient: "linear-gradient(135deg, #0b1f3a, #4c86ff)",
-    image: "/images/marketplace-expansion.png",
   },
 ];
 
@@ -203,7 +196,7 @@ function ServiceRow({
               ))}
             </ul>
             <CTAButton
-              href="#how-we-work"
+              href="#our-process"
               variant="primary"
               size="sm"
               arrow
@@ -221,11 +214,22 @@ function ServiceRow({
 export default function Services() {
   const prefersReducedMotion = useReducedMotion();
   const [active, setActive] = useState(0);
-  const [canHover, setCanHover] = useState(true);
+  // Lazily derives the real value on the client's first render instead of
+  // defaulting to true and correcting it with a setState in an effect — the
+  // default of true is only ever seen server-side, where matchMedia doesn't
+  // exist. The effect below just keeps this in sync if hover capability
+  // changes later (e.g. a mouse is attached to a touch device).
+  const [canHover, setCanHover] = useState(() =>
+    typeof window === "undefined"
+      ? true
+      : window.matchMedia("(hover: hover) and (pointer: fine)").matches,
+  );
 
   useEffect(() => {
     const mql = window.matchMedia("(hover: hover) and (pointer: fine)");
-    setCanHover(mql.matches);
+    const handleChange = () => setCanHover(mql.matches);
+    mql.addEventListener("change", handleChange);
+    return () => mql.removeEventListener("change", handleChange);
   }, []);
 
   return (

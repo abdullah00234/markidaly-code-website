@@ -2,9 +2,10 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { Quote, Star } from "lucide-react";
+import { Pause, Play, Quote, Star } from "lucide-react";
 import { motion, useAnimation, useInView, type Variants } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import { useMediaQuery } from "@/lib/use-media-query";
 
 export interface Testimonial {
   id: number;
@@ -38,6 +39,9 @@ export function AnimatedTestimonials({
   className,
 }: AnimatedTestimonialsProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [userPaused, setUserPaused] = useState(false);
+  const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const autoplayPaused = userPaused || prefersReducedMotion;
 
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
@@ -72,15 +76,19 @@ export function AnimatedTestimonials({
     }
   }, [isInView, controls]);
 
+  // Restarting on activeIndex (not just on mount) means a manual dot click
+  // resets the countdown from the new slide, instead of the old interval
+  // silently firing moments later and overriding the click with whatever
+  // slide it was already counting down to.
   useEffect(() => {
-    if (autoRotateInterval <= 0 || testimonials.length <= 1) return;
+    if (autoplayPaused || autoRotateInterval <= 0 || testimonials.length <= 1) return;
 
     const interval = setInterval(() => {
       setActiveIndex((current) => (current + 1) % testimonials.length);
     }, autoRotateInterval);
 
     return () => clearInterval(interval);
-  }, [autoRotateInterval, testimonials.length]);
+  }, [autoRotateInterval, testimonials.length, activeIndex, autoplayPaused]);
 
   if (testimonials.length === 0) {
     return null;
@@ -122,8 +130,20 @@ export function AnimatedTestimonials({
                       activeIndex === index ? "w-10 bg-primary" : "w-2.5 bg-muted-foreground/30"
                     }`}
                     aria-label={`View testimonial ${index + 1}`}
+                    aria-pressed={activeIndex === index}
                   />
                 ))}
+                {autoRotateInterval > 0 && testimonials.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => setUserPaused((v) => !v)}
+                    aria-label={userPaused ? "Resume testimonial autoplay" : "Pause testimonial autoplay"}
+                    aria-pressed={userPaused}
+                    className="ml-1 flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground/60 transition-colors hover:bg-muted-foreground/10 hover:text-muted-foreground"
+                  >
+                    {userPaused ? <Play className="h-3.5 w-3.5" /> : <Pause className="h-3.5 w-3.5" />}
+                  </button>
+                )}
               </div>
             </div>
           </motion.div>
@@ -134,6 +154,7 @@ export function AnimatedTestimonials({
               <motion.div
                 key={testimonial.id}
                 className="absolute inset-0"
+                aria-hidden={activeIndex !== index}
                 initial={{ opacity: 0, x: 100 }}
                 animate={{
                   opacity: activeIndex === index ? 1 : 0,

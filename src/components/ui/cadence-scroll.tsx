@@ -3,6 +3,7 @@
 import { forwardRef, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { motion } from "motion/react";
+import type { LucideIcon } from "lucide-react";
 import { EASE_PREMIUM, fadeUp } from "@/lib/motion";
 
 // Owl Carousel's default slide transition on canopymanagement.com's
@@ -33,8 +34,32 @@ const VISIBLE_ROWS = 2;
 type CadenceItem = {
   title: string;
   description: string;
-  media: string;
+  // Either a real illustration, or (when one isn't available) an icon +
+  // gradient card — the same icon-fallback pattern already used for
+  // Services.tsx's service rows.
+  media?: string;
+  icon?: LucideIcon;
+  gradient?: string;
 };
+
+function MediaFallback({
+  item,
+  className,
+}: {
+  item: CadenceItem;
+  className?: string;
+}) {
+  const Icon = item.icon;
+  return (
+    <div
+      aria-hidden
+      className={`flex items-center justify-center ${className ?? ""}`}
+      style={{ backgroundImage: item.gradient }}
+    >
+      {Icon && <Icon className="h-14 w-14 text-white/90" strokeWidth={1.5} />}
+    </div>
+  );
+}
 
 export interface CadenceScrollProps {
   items: CadenceItem[];
@@ -167,13 +192,17 @@ export function CadenceScroll({
               {item.description}
             </p>
             <div className="relative h-72 w-full overflow-hidden rounded-2xl bg-white p-2">
-              <Image
-                src={item.media}
-                alt={item.title}
-                fill
-                sizes="90vw"
-                className="object-contain"
-              />
+              {item.media ? (
+                <Image
+                  src={item.media}
+                  alt={item.title}
+                  fill
+                  sizes="90vw"
+                  className="object-contain"
+                />
+              ) : (
+                <MediaFallback item={item} className="h-full w-full rounded-xl" />
+              )}
             </div>
           </motion.div>
         ))}
@@ -204,14 +233,18 @@ export function CadenceScroll({
                   key={`${item.title}-${index}`}
                   className="relative h-full w-full shrink-0"
                 >
-                  <Image
-                    src={item.media}
-                    alt={item.title}
-                    fill
-                    sizes="(min-width: 1024px) 40vw, 50vw"
-                    className="rounded-[1.5rem] object-contain"
-                    priority={index === 0}
-                  />
+                  {item.media ? (
+                    <Image
+                      src={item.media}
+                      alt={item.title}
+                      fill
+                      sizes="(min-width: 1024px) 40vw, 50vw"
+                      className="rounded-[1.5rem] object-contain"
+                      priority={index === 0}
+                    />
+                  ) : (
+                    <MediaFallback item={item} className="h-full w-full rounded-[1.5rem]" />
+                  )}
                 </div>
               ))}
             </motion.div>

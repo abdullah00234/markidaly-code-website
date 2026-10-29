@@ -268,7 +268,7 @@ export default function SoundFamiliar() {
           />
           <BridgeStatement />
           <div className="mx-auto mt-8 w-fit">
-            <CTAButton href="#how-we-work" arrow>
+            <CTAButton href="#our-process" arrow>
               See Our Approach
             </CTAButton>
           </div>

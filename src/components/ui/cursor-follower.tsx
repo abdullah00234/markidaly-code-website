@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useIsClient } from "@uidotdev/usehooks";
+import { useMediaQuery } from "@/lib/use-media-query";
 
 export const Component = () => {
   const mousePosition = useRef({ x: 0, y: 0 });
@@ -10,16 +12,21 @@ export const Component = () => {
 
   const [renderPos, setRenderPos] = useState({ dot: { x: 0, y: 0 }, border: { x: 0, y: 0 } });
   const [isHovering, setIsHovering] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsClient();
+  // Touch devices have no hovering pointer to follow, and showing this
+  // alongside the native cursor there just duplicates it. `(hover: hover)
+  // and (pointer: fine)` is the standard feature-detection for "has a mouse
+  // or trackpad-like pointer" — more reliable than UA sniffing or touch
+  // event presence, which many hybrid laptops report even with a mouse
+  // attached.
+  const hasFinePointer = useMediaQuery("(hover: hover) and (pointer: fine)");
 
   const DOT_SMOOTHNESS = 0.2;
   const BORDER_DOT_SMOOTHNESS = 0.1;
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    if (!hasFinePointer) return;
 
-  useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       mousePosition.current = { x: e.clientX, y: e.clientY };
     };
@@ -72,15 +79,17 @@ export const Component = () => {
 
       cancelAnimationFrame(animationId);
     };
-  }, []);
+  }, [hasFinePointer]);
 
   // Matching null on both the server render and the client's first
   // (hydration) render avoids a server/client markup mismatch — branching
   // on `typeof window` instead would render different output in each pass,
   // since `window` exists by the time client code runs even during
   // hydration. Only the *next* render, once mounted flips after hydration,
-  // shows the real cursor.
-  if (!mounted) return null;
+  // shows the real cursor — and only on devices with a fine (mouse-like)
+  // pointer to actually follow; on touch devices this would otherwise sit
+  // on top of (and duplicate) the native cursor/tap feedback.
+  if (!mounted || !hasFinePointer) return null;
 
   return (
     <div className="pointer-events-none fixed inset-0 z-50">

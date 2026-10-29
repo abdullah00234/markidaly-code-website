@@ -1,129 +1,75 @@
 "use client";
 
-import * as React from "react";
-import { cn } from "@/lib/utils";
+import { GrainGradient, type GrainGradientProps } from "@paper-design/shaders-react";
+import { useWebGL2Available } from "@/lib/webgl";
+import { useMediaQuery } from "@/lib/use-media-query";
 
+// Decorative background wrapper around @paper-design/shaders-react's
+// GrainGradient shader (already a project dependency, same family as
+// gradient-wave.tsx). GrainGradient's `shape`/`softness`/`colors`/`scale`/
+// `rotation`/`speed` map directly onto this component's props; `distortion`
+// maps to GrainGradient's `intensity` (its closest equivalent — "distortion
+// between color bands"). `swirl`, `swirlIterations`, and `shapeScale` have
+// no equivalent in the installed shader version — they're accepted here
+// only so existing call sites keep compiling, and are otherwise unused.
 export interface MeshGradientProps {
+  className?: string;
   colors?: string[];
-  color1?: string;
-  color2?: string;
-  color3?: string;
-  color4?: string;
   speed?: number;
   distortion?: number;
   swirl?: number;
   swirlIterations?: number;
   softness?: number;
-  proportion?: number;
-  shape?: "edge" | "wave" | "circle";
+  shape?: GrainGradientProps["shape"];
   shapeScale?: number;
   scale?: number;
   rotation?: number;
-  className?: string;
-  style?: React.CSSProperties;
 }
 
-let CachedMeshGradient: React.ComponentType<any> | null = null;
+const DEFAULT_COLORS = ["#0b1f3a", "#0c78b8", "#1793c6", "#4c86ff"];
 
-export const MeshGradient = React.memo(function MeshGradient({
-  colors: colorsProp,
-  color1 = "#4c9bff",
-  color2 = "#1f4fd8",
-  color3 = "#0a1a4a",
-  color4,
-  speed = 1,
-  distortion = 1,
-  swirl = 0.57,
-  swirlIterations = 7.4,
-  softness = 1,
-  proportion = 0,
-  shape = "edge",
-  shapeScale = 0.59,
-  scale = 1.45,
-  rotation = 120,
+export function MeshGradient({
   className,
-  style,
+  colors,
+  speed,
+  distortion,
+  softness,
+  shape = "wave",
+  scale,
+  rotation,
 }: MeshGradientProps) {
-  const colors = React.useMemo(() => {
-    if (colorsProp && colorsProp.length > 0) return colorsProp;
-    const list = [color1, color2, color3];
-    if (color4) list.push(color4);
-    return list;
-  }, [colorsProp, color1, color2, color3, color4]);
+  // GrainGradient requires WebGL2 and throws (uncatchably, inside an
+  // un-awaited async effect in the library) when it's unavailable — checked
+  // once on mount instead of assumed, so this never fires on a browser/
+  // environment that can't back it.
+  const webglSupported = useWebGL2Available();
+  const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const [size, setSize] = React.useState({ width: 800, height: 600 });
-  const [mounted, setMounted] = React.useState(false);
-  const [ShaderComp, setShaderComp] =
-    React.useState<React.ComponentType<any> | null>(() => CachedMeshGradient);
-
-  React.useEffect(() => {
-    setMounted(true);
-    if (!CachedMeshGradient) {
-      import("@paper-design/shaders-react")
-        .then((mod) => {
-          CachedMeshGradient = mod.MeshGradient;
-          setShaderComp(() => mod.MeshGradient);
-        })
-        .catch(() => {});
-    }
-  }, []);
-
-  React.useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver((entries) => {
-      const { width, height } = entries[0].contentRect;
-      if (width > 0 && height > 0)
-        setSize({ width: Math.round(width), height: Math.round(height) });
-    });
-    ro.observe(el);
-    const { width, height } = el.getBoundingClientRect();
-    if (width > 0 && height > 0)
-      setSize({ width: Math.round(width), height: Math.round(height) });
-    return () => ro.disconnect();
-  }, []);
-
-  if (!mounted || !ShaderComp) {
+  if (!webglSupported) {
+    const palette = colors && colors.length > 0 ? colors : DEFAULT_COLORS;
     return (
       <div
-        ref={containerRef}
-        className={cn(
-          "size-full bg-gradient-to-tr from-[#0a1a4a] via-[#1f4fd8] to-[#4c9bff]",
-          className,
-        )}
-        style={style}
+        className={className}
+        style={{
+          width: "100%",
+          height: "100%",
+          background: `linear-gradient(135deg, ${palette.join(", ")})`,
+        }}
       />
     );
   }
 
   return (
-    <div
-      ref={containerRef}
-      className={cn(
-        "relative size-full overflow-hidden pointer-events-none select-none",
-        className,
-      )}
-      style={style}
-    >
-      <ShaderComp
-        width={size.width}
-        height={size.height}
-        colors={colors}
-        proportion={proportion}
-        softness={softness}
-        distortion={distortion}
-        swirl={swirl}
-        swirlIterations={swirlIterations}
-        shape={shape}
-        shapeScale={shapeScale}
-        speed={speed}
-        scale={scale}
-        rotation={rotation}
-        style={{ width: "100%", height: "100%" }}
-      />
-    </div>
+    <GrainGradient
+      className={className}
+      colors={colors}
+      speed={prefersReducedMotion ? 0 : speed}
+      intensity={distortion}
+      softness={softness}
+      shape={shape}
+      scale={scale}
+      rotation={rotation}
+      style={{ width: "100%", height: "100%" }}
+    />
   );
-});
-
-export default MeshGradient;
+}
