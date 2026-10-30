@@ -104,7 +104,19 @@ export default function AuditProcess() {
       {/* Tablet/desktop: pinned, scroll-driven wheel (see the ScrollTrigger
           above) — nothing below this block is reachable by scrolling
           further while pinned. */}
-      <div className="relative hidden overflow-hidden rounded-[32px] bg-gradient-hero md:block">
+      <div
+        className="relative hidden overflow-hidden rounded-[32px] bg-gradient-hero md:block"
+        // WebKit (Safari on macOS/iOS) flickers/strobes on a rounded-corner +
+        // overflow-hidden container when a descendant gets its own
+        // compositing layer that repaints every frame — here, the pinned
+        // (position: fixed) GSAP ScrollTrigger section wrapping WorksWheel,
+        // whose cards write transform/opacity straight to the DOM every
+        // frame behind backdrop-blur. Same bug and same fix as Hero.tsx:
+        // force WebKit onto its mask-based clip path instead of its
+        // border-radius clip path. The mask is fully opaque so nothing is
+        // visually cropped. No-op on non-WebKit browsers.
+        style={{ WebkitMaskImage: "-webkit-radial-gradient(white, black)" }}
+      >
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-[0.06]"
@@ -139,10 +151,7 @@ export default function AuditProcess() {
                 className="pointer-events-none absolute inset-0 opacity-[0.06]"
                 style={GRID_OVERLAY_STYLE}
               />
-              <div className="relative flex items-center justify-between">
-                <span className="text-lg font-bold tracking-tight text-primary-bright">
-                  {item.number}
-                </span>
+              <div className="relative flex items-center justify-end">
                 <Icon className="h-6 w-6 text-primary-bright/80" strokeWidth={1.75} aria-hidden />
               </div>
               <h3 className="relative mt-3 text-[17px] font-bold leading-snug text-white">

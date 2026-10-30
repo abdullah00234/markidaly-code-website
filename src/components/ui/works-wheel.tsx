@@ -278,10 +278,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
                     className="relative flex size-full flex-col justify-between overflow-hidden rounded-2xl border border-white/12 bg-white/[0.05] p-[0.7em] shadow-[0_18px_40px_-18px_rgba(0,0,0,0.5)] backdrop-blur-sm"
                     style={{ fontSize: metrics.cardFont }}
                   >
-                    <div className="flex items-center justify-between">
-                      <span className="text-[0.95em] font-bold tracking-tight text-primary-bright">
-                        {item.number}
-                      </span>
+                    <div className="flex items-center justify-end">
                       <Icon
                         className="h-[1.25em] w-[1.25em] text-primary-bright/80"
                         strokeWidth={1.75}
@@ -323,23 +320,19 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
           {items[active]?.title}
         </div>
 
-        <ol
-          className="absolute top-[7.5%] right-[3%] text-right leading-[1.9] text-white/55"
-          style={{ fontSize: metrics.index }}
-        >
+        <ol className="absolute top-[7.5%] right-[3%] flex flex-col items-end gap-[0.6em]">
           {items.map((item, i) => (
             <li key={item.title}>
               <button
                 type="button"
                 onClick={() => onSelect?.(i)}
-                aria-label={`${item.number} ${item.title}`}
+                aria-label={item.title}
                 className={cn(
-                  "focus-visible:outline-white cursor-pointer transition-colors outline-none focus-visible:outline-1",
-                  i === active && "font-semibold text-white",
+                  "focus-visible:outline-white block rounded-full bg-white/35 outline-none transition-all focus-visible:outline-1",
+                  i === active ? "h-[0.55em] w-[0.55em] bg-white" : "h-[0.4em] w-[0.4em]",
                 )}
-              >
-                {item.number}
-              </button>
+                style={{ fontSize: metrics.index }}
+              />
             </li>
           ))}
         </ol>
