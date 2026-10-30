@@ -24,6 +24,7 @@ const phases = {
       title: "Prioritize",
       description:
         "Focus on the highest-impact opportunities across advertising, listings, operations, and profitability.",
+      media: "/images/prioritize-illustration.png",
       icon: SlidersHorizontal,
       gradient: "linear-gradient(135deg, #1f5eff, #0b1f3a)",
     },
@@ -43,6 +44,7 @@ const phases = {
       title: "Scale",
       description:
         "Once the foundation is strong, we help you scale sustainably with a proven, repeatable growth system.",
+      media: "/images/scale-illustration.png",
       icon: TrendingUp,
       gradient: "linear-gradient(135deg, #16294a, #1646c9)",
     },
