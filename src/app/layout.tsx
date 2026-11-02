@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DM_Sans, Plus_Jakarta_Sans } from "next/font/google";
 import SmoothScroll from "@/components/SmoothScroll";
 import { Component as CursorFollower } from "@/components/ui/cursor-follower";
@@ -49,6 +49,13 @@ export const metadata: Metadata = {
     title: "Markidly — Amazon Account Management & Growth Partner",
     description: SITE_DESCRIPTION,
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#0b1f3a",
 };
 
 // Organization structured data — contact details match Footer.tsx verbatim.

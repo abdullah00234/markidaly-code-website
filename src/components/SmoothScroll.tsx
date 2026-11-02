@@ -43,10 +43,20 @@ function LenisScrollTriggerBridge() {
 }
 
 export default function SmoothScroll() {
+  const isCoarsePointer =
+    typeof window !== "undefined" &&
+    window.matchMedia("(pointer: coarse)").matches;
+
   return (
     <ReactLenis
       root
-      options={{ lerp: 0.1, duration: 1.2, anchors: { offset: 88 } }}
+      options={{
+        lerp: 0.1,
+        duration: 1.2,
+        anchors: { offset: 88 },
+        smoothWheel: !isCoarsePointer,
+        syncTouch: false,
+      }}
     >
       <LenisScrollTriggerBridge />
     </ReactLenis>

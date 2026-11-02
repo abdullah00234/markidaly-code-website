@@ -29,8 +29,14 @@ export default function Navbar() {
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
+    if (mobileOpen) {
+      window.__lenisInstance?.stop();
+    } else {
+      window.__lenisInstance?.start();
+    }
     return () => {
       document.body.style.overflow = "";
+      window.__lenisInstance?.start();
     };
   }, [mobileOpen]);
 
@@ -75,7 +81,7 @@ export default function Navbar() {
       initial={{ opacity: 0, y: -16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="fixed inset-x-0 top-0 z-50"
+      className="fixed inset-x-0 top-0 z-50 pt-[env(safe-area-inset-top)]"
     >
       {/* Floating pill on scroll — condenses and insets from the edges,
           revealing the page behind it instead of spanning full-width */}

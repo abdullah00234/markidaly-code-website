@@ -28,7 +28,7 @@ export default function Hero() {
   return (
     <section
       ref={setSectionEl}
-      className="relative h-screen overflow-hidden rounded-b-[40px] sm:rounded-b-[56px] lg:rounded-b-[72px]"
+      className="hero-viewport relative overflow-hidden rounded-b-[40px] sm:rounded-b-[56px] lg:rounded-b-[72px]"
       // WebKit (Safari on both macOS and iOS) flickers/strobes on a
       // rounded-corner + overflow-hidden container when a descendant gets
       // its own compositing layer that repaints every frame — here, the
