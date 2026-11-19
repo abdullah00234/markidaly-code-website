@@ -108,22 +108,32 @@
    this animation made the hero flash pale blue on load before "settling"
    into the right navy a few seconds later. Staying mid-range keeps the
    drift's motion without ever sampling that washed-out corner. */
+/* transform-based, not background-position — animating background-position
+   forces a repaint of the layer's full backing store every frame; transform
+   is compositor-only (GPU), which is what actually fixes the Retina/Chrome
+   tile-dropping flicker on the pinned hero. The layer itself is oversized
+   (see .animate-hero-gradient's `inset: -15%` below) so the translate never
+   reveals an edge. */
 @keyframes hero-gradient-drift {
   0%,
   100% {
-    background-position: 35% 30%;
+    transform: translate3d(0%, 0%, 0);
   }
   50% {
-    background-position: 62% 55%;
+    transform: translate3d(-6%, -5%, 0);
   }
 }
 
+/* Oversized by exactly one grid tile (see .animate-hero-grid's
+   `inset: -56px` below) and translated by that same tile size — a
+   translate3d by one full period loops seamlessly, same as the old
+   background-position slide, but compositor-only. */
 @keyframes hero-grid-drift {
   from {
-    background-position: 0 0;
+    transform: translate3d(0, 0, 0);
   }
   to {
-    background-position: 56px 56px;
+    transform: translate3d(56px, 56px, 0);
   }
 }
 
@@ -175,6 +185,67 @@
     height: 100vh;
     height: 100svh;
     height: 100dvh;
+    min-height: 100vh;
+    min-height: 100svh;
+    min-height: 100dvh;
+    /* clip-path instead of the old mask-image rounded-corner hack — see
+       Hero.tsx for why. Radii match the rounded-b-* classes on the
+       section; keep them in sync if those ever change. */
+    clip-path: inset(0 round 0 0 40px 40px);
+  }
+
+  @media (min-width: 640px) {
+    .hero-viewport {
+      clip-path: inset(0 round 0 0 56px 56px);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero-viewport {
+      clip-path: inset(0 round 0 0 72px 72px);
+    }
+  }
+
+  /* Growth Audit wheel panel (AuditProcess.tsx) — same rounded-corner +
+     constantly-repainting-layer flicker as the hero, same clip-path fix.
+     Radius matches that panel's rounded-[32px] class. */
+  .audit-wheel-viewport {
+    clip-path: inset(0 round 32px);
+  }
+
+  /* Pulls the intro block down from "hugging the navbar" toward the
+     viewport's true vertical center on tall MacBook-class screens (900-
+     1117px tall) — previously 9vh landed right under the navbar and left
+     roughly the bottom half of the hero empty beneath the CTAs. 20vh keeps
+     the copy block's own center near ~38-40% down the viewport across that
+     height range, which is where the 3D core already sits, instead of
+     pinned near the top with dead space below. The floor is raised past
+     5.5rem to 7rem so the "Amazon Growth Agency" badge clears the floating
+     navbar pill (~64-72px tall + its own 12px top margin) once scrolled,
+     instead of sitting right underneath/behind it. */
+  .hero-intro-copy {
+    padding-top: clamp(7rem, 20vh, 14rem);
+  }
+
+  .hero-title,
+  .hero-subtitle {
+    text-wrap: balance;
+  }
+
+  @media (max-height: 760px) {
+    .hero-intro-copy {
+      padding-top: clamp(6rem, 9vh, 7rem);
+    }
+
+    .hero-title {
+      font-size: clamp(2.7rem, 5vw, 4.5rem) !important;
+      line-height: 0.96;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1rem, 1.6vw, 1.2rem) !important;
+      margin-top: 1.25rem;
+    }
   }
 
   .bg-gradient-brand {
@@ -219,11 +290,15 @@
   }
 
   .animate-hero-gradient {
+    inset: -15%;
     background-size: 130% 130%;
+    will-change: transform;
     animation: hero-gradient-drift 24s ease-in-out infinite;
   }
 
   .animate-hero-grid {
+    inset: -56px;
+    will-change: transform;
     animation: hero-grid-drift 14s linear infinite;
   }
 }

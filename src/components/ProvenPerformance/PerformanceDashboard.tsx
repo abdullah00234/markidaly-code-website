@@ -16,7 +16,7 @@ function DeltaBadge({ delta, direction }: { delta: string; direction: "up" | "do
 
 export default function PerformanceDashboard() {
   return (
-    <div className="relative overflow-hidden rounded-[28px] border border-line bg-white p-6 shadow-[0_1px_2px_rgba(11,31,58,0.06),0_32px_64px_-24px_rgba(11,31,58,0.35)] sm:p-8 2xl:mx-10">
+    <div className="relative overflow-hidden rounded-[28px] border border-line bg-white p-6 shadow-[0_1px_2px_rgba(11,31,58,0.06),0_32px_64px_-24px_rgba(11,31,58,0.35)] sm:p-8">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"

@@ -15,17 +15,27 @@ type CTAButtonProps = {
 };
 
 const base =
-  "group relative inline-flex items-center justify-center gap-1 overflow-hidden rounded-full font-semibold transition-all duration-[600ms] ease-[cubic-bezier(0.23,1,0.32,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 active:scale-[0.95]";
+  "group relative inline-flex items-center justify-center gap-1 overflow-hidden rounded-full font-semibold transition-[transform,box-shadow,filter,background-color,border-color,color] duration-300 ease-out will-change-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 active:scale-[0.95]";
 
 const variantStyles: Record<
   NonNullable<CTAButtonProps["variant"]>,
   { container: string; circle: string; hoverRadius: boolean }
 > = {
   primary: {
+    // No border here on purpose — a hairline border (even a "transparent"
+    // one, which still paints a 1.5px ring at fractional-DPI scale factors
+    // like Windows' 125%) rasterizes as a hard dark seam around a gradient
+    // pill instead of the soft edge it's meant to have. The glow comes
+    // entirely from the shadow, which uses one soft, wide blur rather than
+    // a tight near-zero-blur layer, so it never reads as a crisp outline.
     container:
-      "border-[1.5px] border-transparent bg-gradient-brand text-white shadow-[0_1px_2px_rgba(11,31,58,0.08),0_10px_24px_-8px_rgba(31,94,255,0.5)] hover:brightness-110 hover:shadow-[0_1px_2px_rgba(11,31,58,0.08),0_16px_32px_-8px_rgba(31,94,255,0.6)] hover:-translate-y-0.5 active:translate-y-0",
+      "bg-gradient-brand text-white shadow-[0_8px_20px_-6px_rgba(31,94,255,0.55)] hover:brightness-110 hover:shadow-[0_14px_32px_-6px_rgba(31,94,255,0.7)] hover:-translate-y-0.5 active:translate-y-0",
     circle: "",
-    hoverRadius: true,
+    // No liquid circle-fill for this variant, so morphing the pill into a
+    // rounded rect on hover (see hoverRadius below) has nothing to pair
+    // with — it just reads as the button changing shape. Keeping it a
+    // constant pill is what actually reads as smooth/premium.
+    hoverRadius: false,
   },
   secondary: {
     container:

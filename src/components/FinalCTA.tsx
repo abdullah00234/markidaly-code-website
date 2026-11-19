@@ -40,13 +40,40 @@ export default function FinalCTA() {
             "radial-gradient(60% 80% at 15% 20%, rgba(76,134,255,0.35) 0%, transparent 65%)",
         }}
       />
+      {/* Faint gold glow, bottom-right — the section's one touch of the
+          accent, balancing the blue wash on the left. Drifts slowly so the
+          whole backdrop feels alive without drawing attention to itself. */}
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute -bottom-40 left-1/2 h-[420px] w-[820px] -translate-x-1/2 rounded-full bg-[#1793C6]/20 blur-[120px]"
-        animate={{ opacity: [0.5, 0.85, 0.5] }}
+        className="pointer-events-none absolute -bottom-24 -right-20 h-72 w-72 rounded-full bg-gold/[0.1] blur-[100px]"
+        animate={{ x: [0, -24, 0], y: [0, 18, 0] }}
+        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+      />
+      {/* radial-gradient, not blur() — these divs' opacity/position animate
+          forever, and re-rasterizing a CSS blur every frame of an infinite
+          loop is pure GPU cost for a look a gradient already produces for
+          free. */}
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-40 left-1/2 h-[420px] w-[820px] -translate-x-1/2 rounded-full"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, rgba(23,147,198,0.38) 0%, rgba(23,147,198,0) 70%)",
+        }}
+        animate={{ opacity: [0.5, 0.85, 0.5], x: [0, 40, 0] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
-      <div
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute -top-32 right-[10%] h-[320px] w-[320px] rounded-full"
+        style={{
+          background:
+            "radial-gradient(circle at center, rgba(76,134,255,0.3) 0%, rgba(76,134,255,0) 70%)",
+        }}
+        animate={{ opacity: [0.3, 0.6, 0.3], y: [0, 30, 0] }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+      />
+      <motion.div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-[0.06]"
         style={{
@@ -54,6 +81,8 @@ export default function FinalCTA() {
             "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
           backgroundSize: "64px 64px",
         }}
+        animate={{ backgroundPosition: ["0px 0px", "64px 64px"] }}
+        transition={{ duration: 24, repeat: Infinity, ease: "linear" }}
       />
 
       <div className="container-page relative">

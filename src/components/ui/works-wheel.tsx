@@ -43,6 +43,21 @@ export interface WorksWheelProps extends Omit<
   label?: string;
   /** Called with an item's index when the index list or keyboard arrows request it. */
   onSelect?: (index: number) => void;
+  /** Called whenever the item at the front changes, including from scroll-driven `setProgress` calls. */
+  onActiveChange?: (index: number) => void;
+  /** Called every paint with the ring-to-drum amount (0 = still a ring, nothing
+      centred yet; 1 = the active item is fully turned to the front). Lets a
+      caller fade something in lockstep with the front card's own reveal,
+      rather than snapping it on as soon as an item becomes "active". */
+  onReveal?: (amount: number) => void;
+  /** Called every paint with the continuous drum position (0 = item 0 centred,
+      1 = item 1 centred, 2.4 = forty percent of the way from item 2 to item
+      3, ...). Unlike `onActiveChange`'s rounded index, this never jumps — a
+      caller can turn it into a smooth per-item crossfade (e.g.
+      `1 - abs(position - index)`) that tracks the same rotation the cards
+      themselves are mid-way through, instead of cutting at the halfway
+      point. */
+  onPosition?: (position: number) => void;
 }
 
 /* Geometry. The card is measured against the stage; everything else is measured
@@ -103,18 +118,35 @@ function place(
 }
 
 export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
-  function WorksWheel({ items, label, onSelect, className, ...props }, ref) {
+  function WorksWheel(
+    { items, label, onSelect, onActiveChange, onReveal, onPosition, className, ...props },
+    ref,
+  ) {
     const stageRef = React.useRef<HTMLDivElement>(null);
     const wheelRef = React.useRef<HTMLDivElement>(null);
     const cardRefs = React.useRef<(HTMLElement | null)[]>([]);
     const labelRef = React.useRef<HTMLDivElement>(null);
-    const titleRef = React.useRef<HTMLDivElement>(null);
 
     // Only `active` is state - every other visual is written straight to the
     // DOM, so painting a frame is not a render.
     const [active, setActive] = React.useState(0);
     const [stage, setStage] = React.useState<Stage>({ w: 0, h: 0 });
     const lastProgress = React.useRef(0);
+
+    // A ref, not a `paint` dependency - the caller rarely memoizes this, and
+    // re-subscribing it shouldn't tear down and rebuild the paint callback.
+    const onActiveChangeRef = React.useRef(onActiveChange);
+    React.useEffect(() => {
+      onActiveChangeRef.current = onActiveChange;
+    }, [onActiveChange]);
+    const onRevealRef = React.useRef(onReveal);
+    React.useEffect(() => {
+      onRevealRef.current = onReveal;
+    }, [onReveal]);
+    const onPositionRef = React.useRef(onPosition);
+    React.useEffect(() => {
+      onPositionRef.current = onPosition;
+    }, [onPosition]);
 
     const count = items.length;
     const last = Math.max(count - 1, 0);
@@ -204,9 +236,13 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
         }
 
         if (labelRef.current) labelRef.current.style.opacity = String(1 - m);
-        if (titleRef.current) titleRef.current.style.opacity = String(m);
+        onRevealRef.current?.(m);
+        onPositionRef.current?.(pos);
         const near = clamp(Math.round(pos), 0, last);
-        setActive((prev) => (prev === near ? prev : near));
+        setActive((prev) => {
+          if (prev !== near) onActiveChangeRef.current?.(near);
+          return prev === near ? prev : near;
+        });
       },
       [metrics, count, last, reduced],
     );
@@ -275,7 +311,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
                   }}
                 >
                   <span
-                    className="relative flex size-full flex-col justify-between overflow-hidden rounded-2xl border border-white/12 bg-white/[0.05] p-[0.7em] shadow-[0_18px_40px_-18px_rgba(0,0,0,0.5)] backdrop-blur-sm"
+                    className="relative flex size-full flex-col justify-between overflow-hidden rounded-2xl border border-white/12 bg-primary/60 p-[0.7em] shadow-[0_18px_40px_-18px_rgba(0,0,0,0.5)] backdrop-blur-sm"
                     style={{ fontSize: metrics.cardFont }}
                   >
                     <div className="flex items-center justify-end">
@@ -309,16 +345,9 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
             className="pointer-events-none absolute inset-0 grid place-items-center text-center tracking-tight text-white/90"
             style={{ fontSize: metrics.title }}
           >
-            {label}
+            <span className="rounded-2xl bg-primary/60 px-[0.6em] py-[0.35em]">{label}</span>
           </div>
         ) : null}
-        <div
-          ref={titleRef}
-          className="pointer-events-none absolute top-1/2 left-[6%] hidden max-w-[32%] -translate-y-1/2 tracking-tight text-white opacity-0 sm:block"
-          style={{ fontSize: metrics.title }}
-        >
-          {items[active]?.title}
-        </div>
 
         <ol className="absolute top-[7.5%] right-[3%] flex flex-col items-end gap-[0.6em]">
           {items.map((item, i) => (

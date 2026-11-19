@@ -3,7 +3,7 @@ import { CATEGORIES } from "./data";
 export default function CategoriesCard({ className = "" }: { className?: string }) {
   return (
     <div
-      className={`w-full rounded-2xl border border-line bg-white p-5 shadow-[0_1px_2px_rgba(11,31,58,0.06),0_20px_44px_-20px_rgba(11,31,58,0.3)] sm:p-6 lg:w-[250px] ${className}`}
+      className={`mx-auto w-full rounded-2xl border border-line bg-white p-5 shadow-[0_1px_2px_rgba(11,31,58,0.06),0_20px_44px_-20px_rgba(11,31,58,0.3)] sm:p-6 lg:w-[250px] ${className}`}
     >
       <p className="text-[13px] font-bold text-navy">Multiple Categories</p>
       <ul className="mt-3 flex flex-col gap-2.5">

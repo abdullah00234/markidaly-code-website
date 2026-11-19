@@ -65,12 +65,28 @@ export default function ProvenPerformance() {
               ))}
             </motion.div>
 
-            <div className="relative mx-auto mt-16 max-w-4xl pb-6 pt-2 lg:mt-24 lg:pb-10 lg:pt-4">
+            <div className="relative mx-auto mt-16 max-w-4xl pb-6 pt-2 lg:mt-24 lg:pb-10 lg:pt-4 xl:flex xl:max-w-[1550px] xl:items-center xl:gap-6 xl:pb-0 xl:pt-0">
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.4 }}
+                transition={{ duration: 0.6, ease: EASE_PREMIUM, delay: 0.25 }}
+                // Flex item instead of absolute positioning: a fixed negative
+                // offset (the old approach) only clears the dashboard at one
+                // exact viewport width and clips or overlaps at any other —
+                // including the very common 1536px-wide 1920x1080-at-125%-
+                // scaling case. Flex reflows naturally at any width >= xl.
+                className="relative z-20 mt-6 xl:order-1 xl:mt-0 xl:shrink-0 xl:-translate-y-6"
+              >
+                <CategoriesCard />
+              </motion.div>
+
               <motion.div
                 initial={{ opacity: 0, y: 28 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
                 transition={{ duration: 0.7, ease: EASE_PREMIUM }}
+                className="xl:order-2 xl:min-w-0 xl:flex-1"
               >
                 <PerformanceDashboard />
               </motion.div>
@@ -79,18 +95,8 @@ export default function ProvenPerformance() {
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.4 }}
-                transition={{ duration: 0.6, ease: EASE_PREMIUM, delay: 0.25 }}
-                className="relative z-20 mt-6 2xl:absolute 2xl:-left-[180px] 2xl:top-8 2xl:mt-0"
-              >
-                <CategoriesCard />
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.4 }}
                 transition={{ duration: 0.6, ease: EASE_PREMIUM, delay: 0.35 }}
-                className="relative z-20 mt-6 2xl:absolute 2xl:-right-[180px] 2xl:bottom-6 2xl:mt-0"
+                className="relative z-20 mt-6 xl:order-3 xl:mt-0 xl:shrink-0 xl:translate-y-6"
               >
                 <GrowthResultCard />
               </motion.div>

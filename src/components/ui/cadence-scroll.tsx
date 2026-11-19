@@ -38,6 +38,12 @@ type CadenceItem = {
   // gradient card — the same icon-fallback pattern already used for
   // Services.tsx's service rows.
   media?: string;
+  // Illustrations are transparent PNGs sized to sit on a white card with
+  // some breathing room (object-contain). A real photo has no transparency
+  // and needs the opposite treatment — full-bleed, no card background —
+  // so it reads as a photo rather than a shrunken image floating in a
+  // white box with visible letterboxing.
+  photo?: boolean;
   icon?: LucideIcon;
   gradient?: string;
 };
@@ -85,30 +91,33 @@ const CadenceRow = forwardRef<
       onClick={() => setActive(index)}
       className="group relative flex w-full cursor-pointer items-start gap-6 rounded-xl bg-transparent text-left outline-none transition-colors focus-visible:ring-2 focus-visible:ring-gold/60 sm:gap-8"
     >
-      {/* Fixed-size slot keeps the connecting line centered; only the dot
-          inside grows from a plain marker into a numbered, glowing circle
-          when active, matching the reference's ::before pseudo-element. */}
+      {/* Fixed-size slot keeps the connecting line centered. Every step's
+          number stays visible as a ghost ring; the active one fills solid
+          gold with a glow instead of the number appearing/disappearing. */}
       <div className="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center sm:h-12 sm:w-12">
         <motion.span
           animate={{
-            width: isActive ? 44 : 12,
-            height: isActive ? 44 : 12,
-            backgroundColor: isActive ? "rgba(201,162,39,1)" : "rgba(255,255,255,0.35)",
+            width: isActive ? 44 : 38,
+            height: isActive ? 44 : 38,
+            backgroundColor: isActive
+              ? "rgba(201,162,39,1)"
+              : "rgba(255,255,255,0.05)",
+            borderColor: isActive
+              ? "rgba(201,162,39,1)"
+              : "rgba(255,255,255,0.22)",
             boxShadow: isActive
-              ? "0 0 0 6px rgba(201,162,39,0.18), 0 0 20px 4px rgba(201,162,39,0.45)"
+              ? "0 0 0 6px rgba(201,162,39,0.18), 0 0 22px 5px rgba(201,162,39,0.5)"
               : "0 0 0 0 rgba(201,162,39,0)",
           }}
           transition={{ duration: 0.45, ease: EASE_PREMIUM }}
-          className="flex items-center justify-center rounded-full"
+          className="flex items-center justify-center rounded-full border"
         >
           <motion.span
-            animate={{ opacity: isActive ? 1 : 0, scale: isActive ? 1 : 0.4 }}
-            transition={{
-              duration: 0.25,
-              delay: isActive ? 0.2 : 0,
-              ease: EASE_PREMIUM,
+            animate={{
+              color: isActive ? "rgba(255,255,255,1)" : "rgba(255,255,255,0.55)",
             }}
-            className="text-[13px] font-bold text-white"
+            transition={{ duration: 0.3, ease: EASE_PREMIUM }}
+            className="text-[12px] font-bold tabular-nums sm:text-[13px]"
           >
             {pad(index + 1)}
           </motion.span>
@@ -191,14 +200,18 @@ export function CadenceScroll({
             <p className="text-[15px] leading-relaxed text-white/60">
               {item.description}
             </p>
-            <div className="relative h-72 w-full overflow-hidden rounded-2xl bg-white p-2">
+            <div
+              className={`relative h-72 w-full overflow-hidden rounded-2xl ${
+                item.photo ? "" : "bg-white p-2"
+              }`}
+            >
               {item.media ? (
                 <Image
                   src={item.media}
                   alt={item.title}
                   fill
                   sizes="90vw"
-                  className="object-contain"
+                  className={item.photo ? "object-cover" : "object-contain"}
                 />
               ) : (
                 <MediaFallback item={item} className="h-full w-full rounded-xl" />
@@ -218,11 +231,14 @@ export function CadenceScroll({
               (guarding the hero's 3D scene), which disables native sticky
               positioning for every descendant on the page, not just this
               one. The image just sits in normal flow instead. */}
-          <div className="relative h-[34vh] max-h-[320px] min-h-[260px] overflow-hidden rounded-[2rem] border border-white/15 bg-white p-3 shadow-2xl shadow-black/20">
+          <div className="relative h-[34vh] max-h-[320px] min-h-[260px] overflow-hidden rounded-[2rem] border border-white/15 shadow-2xl shadow-black/20">
             {/* Horizontal slide, mirroring the Owl Carousel used on the
                 reference site: all frames sit side by side and the strip
                 translates by one frame width per step (~500ms ease-out),
-                instead of a crossfade. */}
+                instead of a crossfade. The white card background + padding
+                live per-frame (not on this shared strip) so a full-bleed
+                photo frame can skip them while illustration frames keep
+                their breathing room. */}
             <motion.div
               className="flex h-full"
               animate={{ x: `-${activeIndex * 100}%` }}
@@ -231,7 +247,9 @@ export function CadenceScroll({
               {items.map((item, index) => (
                 <div
                   key={`${item.title}-${index}`}
-                  className="relative h-full w-full shrink-0"
+                  className={`relative h-full w-full shrink-0 ${
+                    item.photo ? "" : "bg-white p-3"
+                  }`}
                 >
                   {item.media ? (
                     <Image
@@ -239,7 +257,9 @@ export function CadenceScroll({
                       alt={item.title}
                       fill
                       sizes="(min-width: 1024px) 40vw, 50vw"
-                      className="rounded-[1.5rem] object-contain"
+                      className={
+                        item.photo ? "object-cover" : "rounded-[1.5rem] object-contain"
+                      }
                       priority={index === 0}
                     />
                   ) : (

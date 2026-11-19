@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import HeroMobile from "@/components/HeroMobile";
 import TrustedBy from "@/components/TrustedBy";
 import ProvenPerformance from "@/components/ProvenPerformance";
 import SoundFamiliar from "@/components/SoundFamiliar";
@@ -28,6 +29,7 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero />
+        <HeroMobile />
         <TrustedBy />
         <ProvenPerformance />
         <SoundFamiliar />

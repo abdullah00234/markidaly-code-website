@@ -8,7 +8,6 @@ import {
   Image as FrameIcon,
   Search,
   Target,
-  MousePointerClick,
   LayoutDashboard,
   TrendingUp,
   type LucideIcon,
@@ -53,91 +52,41 @@ type ServiceNode = {
   y: number;
   z: number;
   // Scroll-progress window over which this node's connection line draws in
-  // and stays lit. The three acts with their own camera close-up (SEO, PPC,
-  // Creative) come online as the camera arrives; the rest come online
-  // together during the Account Management "everything reconnects" beat.
+  // and stays lit.
   revealStart: number;
   revealEnd: number;
 };
 
-// The six services this scene exists to visualize — never a product, cart,
+// The five services this scene exists to visualize — never a product, cart,
 // or marketplace UI. Positions stay right-of-core so nodes never drift into
-// the copy column.
+// the copy column. No node has its own dedicated close-up act anymore —
+// they all reveal together in the final "everything reconnects" beat, as
+// plain floating panels with no per-node act copy or extra floating content
+// (keyword chips, campaign cards, creative frames, ACoS counter) of their
+// own.
 const SERVICE_NODES: ServiceNode[] = [
-  { label: "Amazon SEO", tagline: "Rank higher, sell more", icon: Search, x: -5.5, y: 5.5, z: 1.5, revealStart: 0.02, revealEnd: 0.16 },
-  { label: "Amazon PPC", tagline: "Profitable ad spend", icon: Target, x: 6, y: 6.5, z: -1, revealStart: 0.22, revealEnd: 0.36 },
-  { label: "Listing Optimization", tagline: "Convert more browsers", icon: MousePointerClick, x: 8, y: 0, z: 1, revealStart: 0.63, revealEnd: 0.75 },
-  { label: "Creative & A+ Content", tagline: "Brand Story that sells", icon: FrameIcon, x: 7.5, y: -5.5, z: 0.5, revealStart: 0.42, revealEnd: 0.56 },
-  { label: "Account Management", tagline: "Health, ops, compliance", icon: LayoutDashboard, x: -2, y: -6, z: -1.5, revealStart: 0.63, revealEnd: 0.75 },
-  { label: "Growth Strategy", tagline: "One plan, one team", icon: TrendingUp, x: -8, y: 0.5, z: -3, revealStart: 0.63, revealEnd: 0.75 },
+  { label: "Amazon SEO", tagline: "Rank higher, sell more", icon: Search, x: -5.5, y: 5.5, z: 1.5, revealStart: 0.6, revealEnd: 0.75 },
+  { label: "Amazon PPC", tagline: "Profitable ad spend", icon: Target, x: 6, y: 6.5, z: -1, revealStart: 0.6, revealEnd: 0.75 },
+  { label: "Creative & A+ Content", tagline: "Brand Story that sells", icon: FrameIcon, x: 7.5, y: -5.5, z: 0.5, revealStart: 0.6, revealEnd: 0.75 },
+  { label: "Account Management", tagline: "Health, ops, compliance", icon: LayoutDashboard, x: -2, y: -6, z: -1.5, revealStart: 0.6, revealEnd: 0.75 },
+  { label: "Growth Strategy", tagline: "One plan, one team", icon: TrendingUp, x: -8, y: 0.5, z: -3, revealStart: 0.6, revealEnd: 0.75 },
 ];
-
-// Abstract SEO data labels — never a real keyword tool or ranking dashboard.
-// Positions are angularly spread around the SEO node (one direction each —
-// up-left, up-right, left, down-right, down) so their screen-space
-// projections stay clear of each other and of the SEO service panel instead
-// of clustering along the same ray from the node.
-const KEYWORD_ITEMS: { text: string; x: number; y: number; z: number; image?: string }[] = [
-  { text: "Keyword Research", x: -10.5, y: 10.5, z: 3 },
-  { text: "Search Strategy", x: -0.5, y: 11, z: -0.5 },
-  { text: "Ranking Signals", x: -12.5, y: 4.5, z: -1 },
-  { text: "Competitor Analysis", x: -1.5, y: 1, z: 4.5 },
-  { text: "Content Optimization", x: -7.5, y: -0.5, z: 6 },
-];
-
-// Abstract PPC campaign cards — conceptual, not a real ads dashboard.
-// Same angular-spread principle as KEYWORD_ITEMS above — "Performance" used
-// to sit almost directly above the PPC node, the same direction as
-// "Campaigns", which made it land on top of the Amazon PPC panel.
-const CAMPAIGN_ITEMS: { text: string; x: number; y: number; z: number }[] = [
-  { text: "Campaigns", x: 2.5, y: 9.5, z: 1 },
-  { text: "Targeting", x: 9.5, y: 10, z: -3.5 },
-  { text: "Search Terms", x: 1.5, y: 5, z: -4.5 },
-  { text: "Bid Optimization", x: 10, y: 3.5, z: 2 },
-  { text: "Performance", x: 6, y: 1.5, z: -6.5 },
-];
-
-// Creative frames — start scattered, assemble into a small grid as the
-// Creative act plays. Local to the core group, same as everything else.
-const CREATIVE_ITEMS: {
-  text: string;
-  grid: [number, number, number];
-  scatter: [number, number, number];
-  image?: string;
-}[] = [
-  { text: "Product Images", grid: [12, -8.5, 2], scatter: [5.5, -3.5, 8.5] },
-  { text: "A+ Content", grid: [17, -8.5, 2], scatter: [22.5, -2.5, -3.5] },
-  { text: "Brand Story", grid: [12, -13, 2], scatter: [4.5, -16.5, 7.5] },
-  { text: "Storefront", grid: [17, -13, 2], scatter: [23.5, -15.5, -4.5] },
-  { text: "Listing Creative", grid: [14.5, -16, 3.5], scatter: [10.5, -19.5, 9.5] },
-];
-
-const ACOS_STEPS = ["42%", "31%", "22%", "15%"];
 
 // Camera keyframes for the desktop journey — one continuous move through a
 // single persistent scene, not a cut between separate scenes. Positions are
 // world-space, accounting for the core group's own (13, 1, -4) offset.
 const CAMERA_KEYFRAMES: { p: number; pos: THREE.Vector3; look: THREE.Vector3 }[] = [
   { p: 0, pos: new THREE.Vector3(0, 5, 34), look: new THREE.Vector3(3, 2, -4) },
-  { p: 0.2, pos: new THREE.Vector3(4, 7, 20), look: new THREE.Vector3(7.5, 6.5, -1) },
-  { p: 0.4, pos: new THREE.Vector3(10, 8, 18), look: new THREE.Vector3(19, 7.5, -3) },
-  { p: 0.6, pos: new THREE.Vector3(13, -3, 22), look: new THREE.Vector3(15, -10, 2) },
-  { p: 0.8, pos: new THREE.Vector3(-2, 2, 42), look: new THREE.Vector3(11, 0, -4) },
+  { p: 0.6, pos: new THREE.Vector3(-2, 3, 34), look: new THREE.Vector3(7, 1, -5) },
   { p: 1.0, pos: new THREE.Vector3(0, 4, 36), look: new THREE.Vector3(9, 1, -4) },
 ];
 
 // Fade windows for each act's DOM copy, expressed as scroll-progress ranges.
 // Each act's copy fully holds AT its named scroll percentage (matching the
-// camera keyframes below), fading in on approach and out on departure —
-// not fully faded by the time the camera arrives, which was the original
-// (buggy) framing.
+// camera keyframes above), fading in on approach and out on departure.
 const ACT_WINDOWS = {
-  intro: { outStart: 0, outEnd: 0.1 },
-  seo: { inStart: 0.12, inEnd: 0.18, outStart: 0.22, outEnd: 0.28 },
-  ppc: { inStart: 0.32, inEnd: 0.38, outStart: 0.42, outEnd: 0.48 },
-  creative: { inStart: 0.52, inEnd: 0.58, outStart: 0.62, outEnd: 0.68 },
-  account: { inStart: 0.72, inEnd: 0.78, outStart: 0.82, outEnd: 0.88 },
-  growth: { inStart: 0.92, inEnd: 0.98 },
+  intro: { outStart: 0.15, outEnd: 0.35 },
+  growth: { inStart: 0.8, inEnd: 0.9 },
 };
 
 const LINE_SEGMENTS = 48;
@@ -246,13 +195,13 @@ function isWebGLAvailable(): boolean {
 
 /**
  * The hero's background scene — a single continuous "growth control
- * center": one persistent 3D space (a central intelligence core + six
+ * center": one persistent 3D space (a central intelligence core + five
  * orbiting service nodes) that the camera moves through as the user
- * scrolls, rather than cutting between separate scenes. ~300vh of pinned
- * scroll plays five acts in sequence — Intro, Amazon SEO, Amazon PPC,
- * Creative, Account Management, Growth — each bringing its own
- * supplementary visuals (keyword labels, campaign cards, creative frames)
- * into the same space near the node it belongs to.
+ * scrolls, rather than cutting between separate scenes. Pinned scroll plays
+ * two acts in sequence — Intro, Growth — with all five service nodes (SEO,
+ * PPC, Creative, Account Management, Growth Strategy) reconnecting together
+ * as plain panels in that final beat, and the growth curve payoff drawing
+ * in near the end.
  *
  * Raw Three.js (no post-processing/bloom — kept off per the site's "avoid
  * unnecessary post-processing" direction; glow is faked with additive
@@ -270,16 +219,8 @@ export default function HeroScene({ sectionEl, introRef }: HeroSceneProps) {
   const panelChromeRefs = useRef<(HTMLDivElement | null)[]>([]);
   const panelContentRefs = useRef<(HTMLDivElement | null)[]>([]);
   const iconWrapRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const keywordRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const campaignRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const creativeRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  const seoRef = useRef<HTMLDivElement>(null);
-  const ppcRef = useRef<HTMLDivElement>(null);
-  const creativeActRef = useRef<HTMLDivElement>(null);
-  const accountRef = useRef<HTMLDivElement>(null);
   const growthRef = useRef<HTMLDivElement>(null);
-  const acosValueRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -327,6 +268,9 @@ export default function HeroScene({ sectionEl, introRef }: HeroSceneProps) {
     scene.fog = new THREE.FogExp2(BRAND.navy, 0.0026);
 
     const { width, height } = getSize();
+    // Cached, not re-read via getBoundingClientRect() every animation frame
+    // (a layout read) — only the ResizeObserver below updates this.
+    const viewSize = { width, height };
     const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 500);
     camera.position.set(0, 5, 34);
 
@@ -341,7 +285,7 @@ export default function HeroScene({ sectionEl, introRef }: HeroSceneProps) {
     renderer.setSize(width, height);
     // Capped well below native DPR (a 3x/4x panel gains nothing visible
     // from full-resolution WebGL output here, only GPU cost).
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, simplified ? 1 : 1.5));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, simplified ? 1 : 1.25));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.05;
 
@@ -642,35 +586,13 @@ export default function HeroScene({ sectionEl, introRef }: HeroSceneProps) {
 
     // --- Floating data labels (SEO keywords, PPC campaign cards), creative
     // frames, and the closing growth curve — all desktop-only. Each exists
-    // to support either the desktop camera's close-up acts or the
-    // desktop-only floating DOM panels (showPanels); on mobile neither
-    // applies, so skip building them at all rather than creating invisible
-    // geometry that still costs matrix updates every frame. ---
-    const keywordAnchors: THREE.Object3D[] = [];
-    const campaignAnchors: THREE.Object3D[] = [];
-    const creativeAnchors: THREE.Object3D[] = [];
+    // to support the desktop-only floating growth curve; on mobile it
+    // doesn't apply (see `simplified` above), so skip building it at all
+    // rather than creating invisible geometry that still costs matrix
+    // updates every frame. ---
     let growthCurveLine: THREE.Line | null = null;
 
     if (!simplified) {
-      KEYWORD_ITEMS.forEach((k) => {
-        const a = new THREE.Object3D();
-        a.position.set(k.x, k.y, k.z);
-        coreGroup.add(a);
-        keywordAnchors.push(a);
-      });
-      CAMPAIGN_ITEMS.forEach((c) => {
-        const a = new THREE.Object3D();
-        a.position.set(c.x, c.y, c.z);
-        coreGroup.add(a);
-        campaignAnchors.push(a);
-      });
-      CREATIVE_ITEMS.forEach((item) => {
-        const a = new THREE.Object3D();
-        a.position.set(...item.scatter);
-        coreGroup.add(a);
-        creativeAnchors.push(a);
-      });
-
       const growthCurvePoints = new THREE.CatmullRomCurve3([
         new THREE.Vector3(-11, -9, -2),
         new THREE.Vector3(-3, -3, 0),
@@ -714,22 +636,20 @@ export default function HeroScene({ sectionEl, introRef }: HeroSceneProps) {
       }
     }
 
-    // --- Scroll: ~300vh pinned on desktop while scrollProgress (0..1) plays
-    // the five acts in sequence against the full camera/node/panel journey.
-    // Mobile has none of that visual payoff (panels, keyword/campaign/
-    // creative extras, and the camera's close-up moves are all desktop-only —
-    // see `simplified`/`showPanels` above), so holding the same ~300vh pin
+    // --- Scroll: pinned on desktop while scrollProgress (0..1) plays the
+    // intro -> growth journey against the full camera/node/panel journey.
+    // Mobile has none of that visual payoff (panels are desktop-only — see
+    // `simplified`/`showPanels` above), so holding the same pin distance
     // there just reads as a long stretch of empty scrolling before the next
     // section. The act copy still crossfades on mobile, so it keeps a
-    // shorter pinned distance (~160vh) rather than losing the acts
-    // narrative entirely. ---
+    // shorter pinned distance rather than losing the narrative entirely. ---
     let scrollProgress = prefersReducedMotion ? 1 : 0;
     let scrollTrigger: ScrollTrigger | null = null;
     if (!prefersReducedMotion && sectionEl) {
       scrollTrigger = ScrollTrigger.create({
         trigger: sectionEl,
         start: "top top",
-        end: () => "+=" + window.innerHeight * (simplified ? 1.6 : 3),
+        end: () => "+=" + window.innerHeight * (simplified ? 1.1 : 2),
         scrub: 0.6,
         pin: true,
         anticipatePin: 1,
@@ -740,7 +660,16 @@ export default function HeroScene({ sectionEl, introRef }: HeroSceneProps) {
     }
 
     // --- Reusable transform writers for DOM-projected floating elements ---
+    // Every write is skipped unless it actually changed (within a small
+    // epsilon) — these run once per element per frame, and a style write
+    // that doesn't change the rendered pixel is still a style write the
+    // browser has to process.
     const worldPos = new THREE.Vector3();
+    const EPS = 0.01;
+    const floatingCache = new WeakMap<
+      HTMLDivElement,
+      { x: number; y: number; opacity: number; scale: number }
+    >();
     const applyFloating = (
       el: HTMLDivElement | null,
       x: number,
@@ -749,16 +678,46 @@ export default function HeroScene({ sectionEl, introRef }: HeroSceneProps) {
       scale: number
     ) => {
       if (!el) return;
+      const prev = floatingCache.get(el);
+      if (
+        prev &&
+        Math.abs(prev.x - x) < EPS &&
+        Math.abs(prev.y - y) < EPS &&
+        Math.abs(prev.opacity - opacity) < EPS &&
+        Math.abs(prev.scale - scale) < EPS
+      ) {
+        return;
+      }
+      floatingCache.set(el, { x, y, opacity, scale });
       el.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%) scale(${scale})`;
       el.style.opacity = String(opacity);
     };
+    const actBlockCache = new WeakMap<HTMLDivElement, number>();
     const applyActBlock = (el: HTMLDivElement | null, opacity: number, interactive: boolean) => {
       if (!el) return;
+      const prev = actBlockCache.get(el);
+      if (prev !== undefined && Math.abs(prev - opacity) < EPS) return;
+      actBlockCache.set(el, opacity);
       el.style.opacity = String(opacity);
       if (interactive) {
         el.style.pointerEvents = opacity > 0.4 ? "auto" : "none";
         el.style.visibility = opacity > 0.02 ? "visible" : "hidden";
       }
+    };
+    const opacityCache = new WeakMap<HTMLElement, number>();
+    const setOpacityIfChanged = (el: HTMLElement | null, value: number) => {
+      if (!el) return;
+      const prev = opacityCache.get(el);
+      if (prev !== undefined && Math.abs(prev - value) < EPS) return;
+      opacityCache.set(el, value);
+      el.style.opacity = String(value);
+    };
+    const boxShadowCache = new WeakMap<HTMLElement, string>();
+    const setBoxShadowIfChanged = (el: HTMLElement | null, value: string) => {
+      if (!el) return;
+      if (boxShadowCache.get(el) === value) return;
+      boxShadowCache.set(el, value);
+      el.style.boxShadow = value;
     };
 
     let targetCamPos = CAMERA_KEYFRAMES[0].pos.clone();
@@ -784,7 +743,7 @@ export default function HeroScene({ sectionEl, introRef }: HeroSceneProps) {
     };
 
     const updateAll = (elapsed: number) => {
-      const { width: w, height: h } = getSize();
+      const { width: w, height: h } = viewSize;
       const p = scrollProgress;
 
       // Service nodes: reveal + spotlight, per node reveal window.
@@ -841,78 +800,16 @@ export default function HeroScene({ sectionEl, introRef }: HeroSceneProps) {
           const chromeOpacity = revealT < 0.05 ? 0 : 0.3 + spotlight * 0.65;
           const panelScale = 0.92 + spotlight * 0.1;
           applyFloating(panelRefs.current[i], x, y, revealT < 0.05 ? 0 : 1, panelScale);
-          const chrome = panelChromeRefs.current[i];
-          if (chrome) chrome.style.opacity = String(chromeOpacity);
-          const content = panelContentRefs.current[i];
-          if (content) content.style.opacity = String(textOpacity);
-          const iconWrap = iconWrapRefs.current[i];
-          if (iconWrap) {
-            iconWrap.style.boxShadow =
-              spotlight > 0.15
-                ? `0 0 ${12 + spotlight * 18}px rgba(34,211,238,${(0.25 + spotlight * 0.45).toFixed(2)})`
-                : "none";
-          }
+          setOpacityIfChanged(panelChromeRefs.current[i], chromeOpacity);
+          setOpacityIfChanged(panelContentRefs.current[i], textOpacity);
+          setBoxShadowIfChanged(
+            iconWrapRefs.current[i],
+            spotlight > 0.15
+              ? `0 0 ${12 + spotlight * 18}px rgba(34,211,238,${(0.25 + spotlight * 0.45).toFixed(2)})`
+              : "none"
+          );
         }
       });
-
-      // SEO keyword labels — chips track the SEO copy's own visibility
-      // window.
-      if (showPanels) {
-        const seoVis = fadeWindow(p, ACT_WINDOWS.seo.inStart, ACT_WINDOWS.seo.inEnd, ACT_WINDOWS.seo.outStart, ACT_WINDOWS.seo.outEnd);
-        keywordAnchors.forEach((a, i) => {
-          const { x, y } = projectToScreen(a, camera, w, h, worldPos);
-          applyFloating(keywordRefs.current[i], x, y, seoVis * 0.85, 0.9 + seoVis * 0.1);
-        });
-      }
-
-      // PPC campaign cards + ACoS counter
-      if (showPanels) {
-        const ppcVis = fadeWindow(p, ACT_WINDOWS.ppc.inStart, ACT_WINDOWS.ppc.inEnd, ACT_WINDOWS.ppc.outStart, ACT_WINDOWS.ppc.outEnd);
-        campaignAnchors.forEach((a, i) => {
-          const { x, y } = projectToScreen(a, camera, w, h, worldPos);
-          applyFloating(campaignRefs.current[i], x, y, ppcVis * 0.85, 0.9 + ppcVis * 0.1);
-        });
-      }
-      if (acosValueRef.current) {
-        const ppcNode = SERVICE_NODES[1];
-        const acosT = THREE.MathUtils.clamp(
-          (p - ppcNode.revealStart) / (ppcNode.revealEnd - ppcNode.revealStart || 1),
-          0,
-          1
-        );
-        const idx = Math.min(ACOS_STEPS.length - 1, Math.floor(acosT * ACOS_STEPS.length));
-        acosValueRef.current.textContent = ACOS_STEPS[idx];
-      }
-
-      // Creative frames: scatter -> grid assembly (tracks the Creative
-      // node's own reveal window), then hold assembled. Desktop-only — the
-      // anchors don't exist on mobile (showPanels is false there too).
-      if (showPanels) {
-        const creativeNode = SERVICE_NODES[3];
-        const creativeT = THREE.MathUtils.clamp(
-          (p - creativeNode.revealStart) / (creativeNode.revealEnd - creativeNode.revealStart || 1),
-          0,
-          1
-        );
-        const creativeEase = smoothstep(creativeT);
-        const creativeVis = fadeWindow(
-          p,
-          ACT_WINDOWS.creative.inStart,
-          ACT_WINDOWS.creative.inEnd,
-          ACT_WINDOWS.creative.outStart,
-          ACT_WINDOWS.creative.outEnd
-        );
-        CREATIVE_ITEMS.forEach((item, i) => {
-          const anchor = creativeAnchors[i];
-          anchor.position.set(
-            THREE.MathUtils.lerp(item.scatter[0], item.grid[0], creativeEase),
-            THREE.MathUtils.lerp(item.scatter[1], item.grid[1], creativeEase),
-            THREE.MathUtils.lerp(item.scatter[2], item.grid[2], creativeEase)
-          );
-          const { x, y } = projectToScreen(anchor, camera, w, h, worldPos);
-          applyFloating(creativeRefs.current[i], x, y, creativeVis, 0.85 + creativeEase * 0.15);
-        });
-      }
 
       // Growth curve — draws in only during the final act. Doesn't exist
       // on mobile.
@@ -931,12 +828,15 @@ export default function HeroScene({ sectionEl, introRef }: HeroSceneProps) {
       // Act copy crossfades (skipped for reduced motion — handled by the
       // static branch instead).
       if (!prefersReducedMotion) {
-        const introVisibility = 1 - THREE.MathUtils.clamp(p / (ACT_WINDOWS.intro.outEnd || 1), 0, 1);
+        const introVisibility =
+          1 -
+          THREE.MathUtils.clamp(
+            (p - ACT_WINDOWS.intro.outStart) /
+              ((ACT_WINDOWS.intro.outEnd - ACT_WINDOWS.intro.outStart) || 1),
+            0,
+            1
+          );
         applyActBlock(introRef.current, introVisibility, true);
-        applyActBlock(seoRef.current, fadeWindow(p, ACT_WINDOWS.seo.inStart, ACT_WINDOWS.seo.inEnd, ACT_WINDOWS.seo.outStart, ACT_WINDOWS.seo.outEnd), false);
-        applyActBlock(ppcRef.current, fadeWindow(p, ACT_WINDOWS.ppc.inStart, ACT_WINDOWS.ppc.inEnd, ACT_WINDOWS.ppc.outStart, ACT_WINDOWS.ppc.outEnd), false);
-        applyActBlock(creativeActRef.current, fadeWindow(p, ACT_WINDOWS.creative.inStart, ACT_WINDOWS.creative.inEnd, ACT_WINDOWS.creative.outStart, ACT_WINDOWS.creative.outEnd), false);
-        applyActBlock(accountRef.current, fadeWindow(p, ACT_WINDOWS.account.inStart, ACT_WINDOWS.account.inEnd, ACT_WINDOWS.account.outStart, ACT_WINDOWS.account.outEnd), false);
         applyActBlock(growthRef.current, fadeWindow(p, ACT_WINDOWS.growth.inStart, ACT_WINDOWS.growth.inEnd), true);
       }
 
@@ -957,9 +857,9 @@ export default function HeroScene({ sectionEl, introRef }: HeroSceneProps) {
     if (prefersReducedMotion) {
       // Accessible resting state: intro copy + a fully-connected node
       // network on a nice wide establishing shot. The act-by-act journey
-      // (keyword/campaign/creative extras, ranking/ACoS counters, growth
-      // curve) is a scroll-driven narrative that doesn't apply here, so it
-      // stays hidden rather than being crammed into one static frame.
+      // (the growth curve) is a scroll-driven narrative that doesn't apply
+      // here, so it stays hidden rather than being crammed into one static
+      // frame.
       coreGroup.rotation.y = -0.05;
       // Camera must be positioned BEFORE any screen-projection below, or
       // panels project using the default (unaimed) camera transform.
@@ -1000,8 +900,12 @@ export default function HeroScene({ sectionEl, introRef }: HeroSceneProps) {
     const clock = new THREE.Clock();
     // Mobile GPUs are the ones this matters most for, and the motion here
     // is slow/ambient anyway — capping to ~30fps there roughly halves GPU
-    // work on a 60Hz panel with no visible loss of smoothness.
-    const minFrameInterval = simplified ? 1 / 30 : 0;
+    // work on a 60Hz panel with no visible loss of smoothness. Desktop is
+    // capped to 60fps too — on a 120Hz ProMotion Mac this scene would
+    // otherwise render twice as often as a 60Hz panel for no visible gain
+    // (the camera/reveal motion is all scroll-driven, not frame-rate
+    // dependent), doubling GPU work for nothing.
+    const minFrameInterval = simplified ? 1 / 30 : 1 / 60;
     let lastRenderTime = 0;
     const animate = () => {
       animationId = requestAnimationFrame(animate);
@@ -1030,11 +934,52 @@ export default function HeroScene({ sectionEl, introRef }: HeroSceneProps) {
 
       renderer.render(scene, camera);
     };
+    const stopLoop = () => {
+      if (animationId != null) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+      }
+    };
+    // Pin spacer visibility: while sectionEl is intersecting the viewport,
+    // the hero is either in its normal scroll position or pinned (fixed)
+    // on screen — either way it's actually being seen. Once scroll carries
+    // it past the pin (the ~300vh pin spacer has fully scrolled by), it
+    // stops intersecting and there's no reason to keep burning GPU on a
+    // scene nobody can see.
+    let sectionVisible = true;
+    let pageVisible = typeof document === "undefined" || !document.hidden;
+    const shouldRun = () => !prefersReducedMotion && sectionVisible && pageVisible;
+    const startLoop = () => {
+      if (animationId == null && shouldRun()) animate();
+    };
     if (!prefersReducedMotion) animate();
+
+    let sectionObserver: IntersectionObserver | null = null;
+    if (sectionEl && !prefersReducedMotion) {
+      sectionObserver = new IntersectionObserver(
+        ([entry]) => {
+          sectionVisible = entry.isIntersecting;
+          if (shouldRun()) startLoop();
+          else stopLoop();
+        },
+        { threshold: 0 }
+      );
+      sectionObserver.observe(sectionEl);
+    }
+    const onVisibilityChange = () => {
+      pageVisible = !document.hidden;
+      if (shouldRun()) startLoop();
+      else stopLoop();
+    };
+    if (!prefersReducedMotion) {
+      document.addEventListener("visibilitychange", onVisibilityChange);
+    }
 
     const resizeObserver = new ResizeObserver(() => {
       const { width: w, height: h } = getSize();
       if (w === 0 || h === 0) return;
+      viewSize.width = w;
+      viewSize.height = h;
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
@@ -1045,7 +990,9 @@ export default function HeroScene({ sectionEl, introRef }: HeroSceneProps) {
     resizeObserver.observe(container);
 
     return () => {
-      if (animationId) cancelAnimationFrame(animationId);
+      stopLoop();
+      sectionObserver?.disconnect();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       resizeObserver.disconnect();
       scrollTrigger?.kill();
       entranceTl?.kill();
@@ -1105,17 +1052,22 @@ export default function HeroScene({ sectionEl, introRef }: HeroSceneProps) {
               panelRefs.current[i] = el;
             }}
             className="absolute left-0 top-0 w-[176px] opacity-0"
-            style={{ willChange: "transform, opacity" }}
+            style={{ willChange: "transform" }}
           >
             {/* Glass chrome — dims independently of the label below so a
                 resting (already-visited) panel can fade into the
                 background without taking the text's legibility with it. */}
+            {/* No backdrop-blur: these sit over the per-frame WebGL canvas,
+                and blur()ing a region that repaints every frame forces the
+                browser to recompute the blur every frame too. A slightly
+                more opaque flat background reads the same without that
+                cost. */}
             <div
               ref={(el) => {
                 panelChromeRefs.current[i] = el;
               }}
               aria-hidden
-              className="absolute inset-0 rounded-2xl border border-white/15 bg-white/[0.06] backdrop-blur-md"
+              className="absolute inset-0 rounded-2xl border border-white/15 bg-[rgba(20,45,80,0.55)]"
             />
             <div
               ref={(el) => {
@@ -1142,156 +1094,10 @@ export default function HeroScene({ sectionEl, introRef }: HeroSceneProps) {
         ))}
       </div>
 
-      {/* SEO keyword labels */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-10 hidden md:block">
-        {KEYWORD_ITEMS.map((item, i) =>
-          item.image ? (
-            <div
-              key={item.text}
-              ref={(el) => {
-                keywordRefs.current[i] = el;
-              }}
-              className="absolute left-0 top-0 h-[70px] w-[104px] overflow-hidden rounded-xl border border-cyan-300/25 opacity-0 shadow-lg"
-              style={{ willChange: "transform, opacity" }}
-            >
-              <Image src={item.image} alt="" fill sizes="104px" className="object-cover" />
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-2 pb-1 pt-3">
-                <span className="text-[10px] font-medium leading-tight text-hero-white">
-                  {item.text}
-                </span>
-              </div>
-            </div>
-          ) : (
-            <div
-              key={item.text}
-              ref={(el) => {
-                keywordRefs.current[i] = el;
-              }}
-              className="absolute left-0 top-0 whitespace-nowrap rounded-full border border-cyan-300/25 bg-cyan-400/[0.08] px-3.5 py-1.5 text-[12px] font-medium text-hero-white opacity-0 backdrop-blur-md"
-              style={{ willChange: "transform, opacity" }}
-            >
-              {item.text}
-            </div>
-          )
-        )}
-      </div>
-
-      {/* PPC campaign cards */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-10 hidden md:block">
-        {CAMPAIGN_ITEMS.map((item, i) => (
-          <div
-            key={item.text}
-            ref={(el) => {
-              campaignRefs.current[i] = el;
-            }}
-            className="absolute left-0 top-0 whitespace-nowrap rounded-xl border border-white/15 bg-white/[0.06] px-3.5 py-2 text-[12px] font-semibold text-hero-white opacity-0 backdrop-blur-md"
-            style={{ willChange: "transform, opacity" }}
-          >
-            {item.text}
-          </div>
-        ))}
-      </div>
-
-      {/* Creative frames */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-10 hidden md:block">
-        {CREATIVE_ITEMS.map((item, i) =>
-          item.image ? (
-            <div
-              key={item.text}
-              ref={(el) => {
-                creativeRefs.current[i] = el;
-              }}
-              className="absolute left-0 top-0 h-[86px] w-[110px] overflow-hidden rounded-xl border border-white/20 opacity-0 shadow-lg"
-              style={{ willChange: "transform, opacity" }}
-            >
-              <Image src={item.image} alt="" fill sizes="110px" className="object-cover" />
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-2 pb-1 pt-3">
-                <span className="text-[10px] font-medium leading-tight text-hero-white">
-                  {item.text}
-                </span>
-              </div>
-            </div>
-          ) : (
-            <div
-              key={item.text}
-              ref={(el) => {
-                creativeRefs.current[i] = el;
-              }}
-              className="absolute left-0 top-0 flex h-[86px] w-[110px] flex-col items-center justify-center gap-1.5 rounded-xl border border-white/20 bg-white/[0.07] opacity-0 backdrop-blur-md"
-              style={{ willChange: "transform, opacity" }}
-            >
-              <FrameIcon className="h-4 w-4 text-cyan-200" strokeWidth={1.75} />
-              <span className="px-2 text-center text-[11px] font-medium leading-tight text-hero-white/85">
-                {item.text}
-              </span>
-            </div>
-          )
-        )}
-      </div>
-
       {/* Act copy (intro copy itself is server-rendered in Hero.tsx — this
           component only drives its fade/position via introRef) */}
       <div className="pointer-events-none absolute inset-0 z-20">
         <div className="container-page relative h-full">
-          {/* 20% — Amazon SEO */}
-          <div ref={seoRef} className="absolute inset-0 flex items-start pt-28 opacity-0 md:pt-32 lg:pt-40">
-            <div className="max-w-xl">
-              <span className="inline-flex items-center rounded-full border border-white/15 bg-white/[0.06] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-hero-white/85 backdrop-blur-sm">
-                Amazon SEO
-              </span>
-              <p className="mt-7 max-w-sm text-[19px] leading-relaxed text-hero-white">
-                Keyword research, listing optimization, and search ranking
-                strategy to help your products get found.
-              </p>
-            </div>
-          </div>
-
-          {/* 40% — Amazon PPC */}
-          <div ref={ppcRef} className="absolute inset-0 flex items-start pt-28 opacity-0 md:pt-32 lg:pt-40">
-            <div className="max-w-xl">
-              <span className="inline-flex items-center rounded-full border border-white/15 bg-white/[0.06] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-hero-white/85 backdrop-blur-sm">
-                Amazon PPC
-              </span>
-              <div className="mt-7 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <span ref={acosValueRef} className="text-[44px] font-black leading-none tracking-tight text-hero-white sm:text-[64px]">
-                  42%
-                </span>
-                <span className="text-[15px] font-medium text-hero-white/70 sm:text-[17px]">
-                  conceptual ACoS optimization
-                </span>
-              </div>
-              <p className="mt-3 max-w-sm text-[13.5px] leading-relaxed text-hero-white/50">
-                Conceptual optimization curve — for illustration only.
-              </p>
-            </div>
-          </div>
-
-          {/* 60% — Creative */}
-          <div ref={creativeActRef} className="absolute inset-0 flex items-start pt-28 opacity-0 md:pt-32 lg:pt-40">
-            <div className="max-w-xl">
-              <span className="inline-flex items-center rounded-full border border-white/15 bg-white/[0.06] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-hero-white/85 backdrop-blur-sm">
-                Creative &amp; Brand
-              </span>
-              <p className="mt-6 max-w-sm text-[17px] leading-relaxed text-hero-white/70">
-                Product imagery, A+ Content, Brand Story, and storefront
-                creative — assembled into one system.
-              </p>
-            </div>
-          </div>
-
-          {/* 80% — Account Management */}
-          <div ref={accountRef} className="absolute inset-0 flex items-start pt-28 opacity-0 md:pt-32 lg:pt-40">
-            <div className="max-w-xl">
-              <span className="inline-flex items-center rounded-full border border-white/15 bg-white/[0.06] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-hero-white/85 backdrop-blur-sm">
-                Account Management
-              </span>
-              <p className="mt-6 max-w-sm text-[17px] leading-relaxed text-hero-white/70">
-                SEO · PPC · Creative · Listing · Analytics — one connected
-                system, one accountable team.
-              </p>
-            </div>
-          </div>
-
           {/* 100% — Growth */}
           <div ref={growthRef} className="absolute inset-0 flex items-start pt-28 opacity-0 md:pt-32 lg:pt-40">
             <div className="max-w-xl">
@@ -1299,8 +1105,8 @@ export default function HeroScene({ sectionEl, introRef }: HeroSceneProps) {
                 One Team. Every Amazon Growth Layer.
               </h2>
               <p className="mt-6 max-w-lg text-[19px] leading-relaxed text-hero-white">
-                Strategy, SEO, PPC, creative, and account management working
-                together to move your brand forward.
+                Strategy, creative, and hands-on execution working together
+                to move your brand forward.
               </p>
               <div className="mt-9">
                 <CTAButton href="#book-audit" arrow>

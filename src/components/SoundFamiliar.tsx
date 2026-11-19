@@ -141,13 +141,24 @@ function SectionBackdrop({ animate }: { animate: boolean }) {
           backgroundSize: "56px 56px",
         }}
       />
+      {/* radial-gradient, not blur() — these drift forever via an infinite
+          transform loop; animating a CSS blur that long re-rasterizes every
+          frame for no visual gain over a gradient. */}
       <motion.div
-        className="absolute -right-40 -top-24 h-[440px] w-[440px] rounded-full bg-primary/[0.09] blur-[120px]"
+        className="absolute -right-40 -top-24 h-[440px] w-[440px] rounded-full"
+        style={{
+          background:
+            "radial-gradient(circle at center, rgba(31,94,255,0.22) 0%, rgba(31,94,255,0) 70%)",
+        }}
         animate={animate ? { x: [0, -26, 0], y: [0, 22, 0] } : undefined}
         transition={{ duration: 17, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute -left-28 bottom-0 h-[360px] w-[360px] rounded-full bg-gold/[0.12] blur-[100px]"
+        className="absolute -left-28 bottom-0 h-[360px] w-[360px] rounded-full"
+        style={{
+          background:
+            "radial-gradient(circle at center, rgba(201,162,39,0.28) 0%, rgba(201,162,39,0) 70%)",
+        }}
         animate={animate ? { x: [0, 24, 0], y: [0, -18, 0] } : undefined}
         transition={{ duration: 19, repeat: Infinity, ease: "easeInOut", delay: 1 }}
       />

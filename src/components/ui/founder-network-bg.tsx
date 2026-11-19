@@ -59,10 +59,30 @@ export default function FounderNetworkBackground() {
         />
       )}
 
+      {/* radial-gradient, not blur() — this drifts forever via an infinite
+          transform loop; animating a CSS blur that long re-rasterizes every
+          frame for no visual gain over a gradient. */}
       <motion.div
-        className="absolute left-1/2 top-1/2 h-[480px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-[120px]"
+        className="absolute left-1/2 top-1/2 h-[480px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, rgba(31,94,255,0.22) 0%, rgba(31,94,255,0) 70%)",
+        }}
         animate={prefersReducedMotion ? undefined : { x: [0, 40, -30, 0], y: [0, -24, 18, 0] }}
         transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      {/* One small gold counterpart to the blue glow above — this section
+          introduces the founders, so it gets a touch of the same premium
+          accent used elsewhere, kept to a single faint bloom. */}
+      <motion.div
+        className="absolute right-[8%] bottom-[6%] h-64 w-64 rounded-full"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, rgba(201,162,39,0.18) 0%, rgba(201,162,39,0) 70%)",
+        }}
+        animate={prefersReducedMotion ? undefined : { x: [0, -20, 14, 0], y: [0, 16, -10, 0] }}
+        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
       />
 
       <svg

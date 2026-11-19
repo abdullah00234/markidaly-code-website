@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import CTAButton from "./ui/CTAButton";
 
@@ -25,19 +25,36 @@ export default function Hero() {
   // fade/position directly via the ref, exactly as if it owned the node.
   const introRef = useRef<HTMLDivElement>(null);
 
+  // This whole hero (and its WebGL scene) is desktop/tablet-only — mobile
+  // gets HeroMobile.tsx instead, a plain static section with no canvas/GSAP
+  // cost. `hidden md:block` below handles the visual swap with zero FOUC
+  // (pure CSS, no JS needed), but without this check HeroScene would still
+  // mount and run its full Three.js/ScrollTrigger setup underneath that
+  // `hidden` class, wasting CPU/battery on a screen that never shows it. So
+  // this also gates whether HeroScene mounts at all.
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const update = () => setIsDesktop(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
   return (
     <section
       ref={setSectionEl}
-      className="hero-viewport relative overflow-hidden rounded-b-[40px] sm:rounded-b-[56px] lg:rounded-b-[72px]"
-      // WebKit (Safari on both macOS and iOS) flickers/strobes on a
-      // rounded-corner + overflow-hidden container when a descendant gets
-      // its own compositing layer that repaints every frame — here, the
-      // GSAP-pinned (position: fixed) WebGL canvas plus the animated
-      // background-position gradient layers above. Forcing WebKit onto its
-      // mask-based clip path instead of its border-radius clip path avoids
-      // that repaint bug; the mask is fully opaque so nothing is visually
-      // cropped. No-op on non-WebKit browsers.
-      style={{ WebkitMaskImage: "-webkit-radial-gradient(white, black)" }}
+      className="hero-viewport relative hidden overflow-hidden rounded-b-[40px] sm:rounded-b-[56px] md:block lg:rounded-b-[72px]"
+      // Chrome on high-DPI (Retina) displays drops/corrupts compositor
+      // tiles on a rounded-corner + overflow-hidden container when a
+      // descendant is a large, constantly-repainting compositing layer —
+      // here, the GSAP-pinned (position: fixed) WebGL canvas. A mask-image
+      // forces its own offscreen mask layer, which made this worse, not
+      // better. clip-path (see .hero-viewport in globals.css) achieves the
+      // same rounded-corner clipping without that extra layer; `isolation:
+      // isolate` gives the section its own stacking context so the pinned
+      // canvas composites against a stable backdrop.
+      style={{ isolation: "isolate" }}
     >
       {/* Solid brand-gradient ground, no stock photography or dashboard
           screenshots — depth comes from the dot grid + the 3D scene layered
@@ -46,22 +63,37 @@ export default function Hero() {
           WebGL is unavailable or the device is low-end (see HeroScene's
           canvas.style.display = "none" path), and adds a subtle extra
           touch of life underneath the 3D scene the rest of the time. */}
-      <div aria-hidden className="absolute inset-0 bg-gradient-hero-dark animate-hero-gradient" />
+      <div aria-hidden className="absolute bg-gradient-hero-dark animate-hero-gradient" />
+      {/* Faint gold corner glow — echoes the single gold "growth curve"
+          payoff inside HeroScene itself, so the accent reads from the very
+          first frame rather than only once the 3D scene scrolls into it. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.07] animate-hero-grid"
+        className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-gold/[0.1] blur-[100px]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute opacity-[0.07] animate-hero-grid"
         style={{
           backgroundImage:
             "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
           backgroundSize: "56px 56px",
         }}
       />
-      <HeroScene sectionEl={sectionEl} introRef={introRef} />
+      {isDesktop && <HeroScene sectionEl={sectionEl} introRef={introRef} />}
       {/* Left-weighted scrim so copy stays readable over the scene without
-          needing a separate boxed visual. */}
+          needing a separate boxed visual. The old 65% transparent-stop left
+          a fully-unscrimmed gap right where the intro subtitle's own
+          centered text column can land (its line wraps shift with viewport
+          width/font metrics) — on several common MacBook widths a word
+          lands directly over the bright core glow with zero darkening
+          behind it. Extending the fade with a longer, lighter tail (through
+          ~80%) covers that zone without meaningfully changing the scrim's
+          left-weighted character or dimming the service-node panels, which
+          already carry their own opaque background. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(100deg,rgba(11,31,58,0.55)_0%,rgba(11,31,58,0.15)_42%,transparent_65%)]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(100deg,rgba(11,31,58,0.55)_0%,rgba(11,31,58,0.22)_48%,rgba(11,31,58,0.08)_68%,transparent_82%)]"
       />
 
       {/* 0% — Intro copy. Server-rendered; HeroScene fades/positions it via
@@ -70,18 +102,23 @@ export default function Hero() {
         <div className="container-page relative h-full">
           <div
             ref={introRef}
-            className="absolute inset-0 flex items-start justify-center pt-28 md:pt-32 lg:pt-40"
+            className="hero-intro-copy absolute inset-0 flex items-start justify-center"
           >
-            <div className="mx-auto max-w-xl text-center">
-              <div className="mx-auto mb-6 inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-white/[0.06] px-1.5 py-1.5 backdrop-blur-sm">
-                <span className="inline-flex items-center rounded-full bg-primary px-2.5 py-1 text-[11px] font-semibold text-black">
+            <div className="mx-auto max-w-[760px] px-4 text-center sm:px-6">
+              {/* No backdrop-blur: this sits directly over the per-frame
+                  WebGL canvas, and blur()ing a region that repaints every
+                  frame forces the browser to recompute the blur every
+                  frame too. A slightly more opaque flat background reads
+                  the same without that cost. */}
+              <div className="mx-auto mb-6 inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-[rgba(20,45,80,0.55)] px-1.5 py-1.5">
+                <span className="inline-flex items-center rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-[#0b1f3a]">
                   Amazon Growth Agency
                 </span>
               </div>
-              <h1 className="text-[44px] font-black leading-[1.14] tracking-tight text-hero-white sm:text-[54px] lg:text-[60px]">
+              <h1 className="hero-title text-[clamp(3rem,5.2vw,7rem)] font-black leading-[0.94] tracking-[-0.06em] text-hero-white">
                 Built to Grow Brands on Amazon.
               </h1>
-              <p className="mx-auto mt-6 max-w-lg text-[19px] leading-relaxed text-hero-white">
+              <p className="hero-subtitle mx-auto mt-6 max-w-[760px] text-[clamp(1.05rem,1.8vw,1.55rem)] leading-relaxed text-hero-white">
                 We combine strategy, data, creative, and performance
                 marketing to help Amazon brands scale profitably.
               </p>

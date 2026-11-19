@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { motion, useReducedMotion } from "motion/react";
 import {
   ArrowUpRight,
@@ -24,7 +23,6 @@ const SERVICES: {
   bullets: string[];
   icon: LucideIcon;
   gradient: string;
-  image?: string;
 }[] = [
   {
     title: "Amazon Account Management",
@@ -35,7 +33,6 @@ const SERVICES: {
     ],
     icon: LayoutDashboard,
     gradient: "linear-gradient(135deg, #1f5eff, #0b1f3a)",
-    image: "/images/amazon-account-management.png",
   },
   {
     title: "Amazon PPC Management",
@@ -46,7 +43,6 @@ const SERVICES: {
     ],
     icon: Target,
     gradient: "linear-gradient(135deg, #4c86ff, #16294a)",
-    image: "/images/amazon-ppc-management.png",
   },
   {
     title: "Amazon Listing Optimization & CRO",
@@ -57,7 +53,6 @@ const SERVICES: {
     ],
     icon: Search,
     gradient: "linear-gradient(135deg, #1646c9, #1f5eff)",
-    image: "/images/amazon-listing-optimization.png",
   },
   {
     title: "Storefront & Brand Experience",
@@ -68,7 +63,6 @@ const SERVICES: {
     ],
     icon: Store,
     gradient: "linear-gradient(135deg, #1793c6, #0b1f3a)",
-    image: "/images/storefront-brand-experience.png",
   },
   {
     title: "Product Launch & Ranking",
@@ -79,7 +73,6 @@ const SERVICES: {
     ],
     icon: Rocket,
     gradient: "linear-gradient(135deg, #1f5eff, #4c86ff)",
-    image: "/images/product-launch-ranking.png",
   },
   {
     title: "Inventory, Operations & Account Health",
@@ -90,7 +83,6 @@ const SERVICES: {
     ],
     icon: PackageCheck,
     gradient: "linear-gradient(135deg, #16294a, #1646c9)",
-    image: "/images/inventory-operations-account-health.png",
   },
   {
     title: "Marketplace Expansion",
@@ -101,7 +93,6 @@ const SERVICES: {
     ],
     icon: Globe,
     gradient: "linear-gradient(135deg, #0b1f3a, #4c86ff)",
-    image: "/images/marketplace-expansion.png",
   },
 ];
 
@@ -166,28 +157,13 @@ function ServiceRow({
                 : "-translate-y-1 opacity-0"
             }`}
           >
-            {service.image ? (
-              <div
-                aria-hidden
-                className="relative h-20 w-32 shrink-0 overflow-hidden rounded-2xl sm:h-24 sm:w-36"
-              >
-                <Image
-                  src={service.image}
-                  alt=""
-                  fill
-                  sizes="(min-width: 640px) 144px, 128px"
-                  className="object-cover"
-                />
-              </div>
-            ) : (
-              <div
-                aria-hidden
-                className="flex h-20 w-32 shrink-0 items-center justify-center rounded-2xl sm:h-24 sm:w-36"
-                style={{ backgroundImage: service.gradient }}
-              >
-                <Icon className="h-8 w-8 text-white/90" strokeWidth={1.75} />
-              </div>
-            )}
+            <div
+              aria-hidden
+              className="flex h-20 w-32 shrink-0 items-center justify-center rounded-2xl sm:h-24 sm:w-36"
+              style={{ backgroundImage: service.gradient }}
+            >
+              <Icon className="h-8 w-8 text-white/90" strokeWidth={1.75} />
+            </div>
             <ul className="flex flex-1 flex-wrap gap-x-7 gap-y-2">
               {service.bullets.map((bullet) => (
                 <li
@@ -270,7 +246,7 @@ export default function Services() {
         >
           <div className="mb-4 flex items-center justify-between gap-4">
             <span className="inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.18em] text-white/40">
-              <span className="h-[7px] w-[7px] shrink-0 rounded-full bg-primary-bright" />
+              <span className="h-[7px] w-[7px] shrink-0 rounded-full bg-gold" />
               {String(SERVICES.length).padStart(2, "0")} Services
             </span>
           </div>

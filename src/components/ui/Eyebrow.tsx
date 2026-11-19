@@ -13,9 +13,10 @@ export default function Eyebrow({
         tone === "dark" ? "text-white/60" : "text-primary"
       }`}
     >
-      <span
-        className={`h-1.5 w-1.5 rounded-full ${tone === "dark" ? "bg-gold" : "bg-gradient-brand"}`}
-      />
+      {/* Gold dot on every eyebrow, light or dark tone — the one consistent
+          touch of the brand's gold accent repeated across each section
+          label site-wide, while headings/body stay blue-dominant. */}
+      <span className="h-1.5 w-1.5 rounded-full bg-gold" />
       {children}
     </p>
   );

@@ -18,13 +18,15 @@ const phases = {
       title: "Diagnose",
       description:
         "Deep dive into your account, data, and marketplace reality to identify what's really holding growth back.",
-      media: "/images/diagnose-illustration.png",
+      media: "/images/diagnose-photo.jpg",
+      photo: true,
     },
     {
       title: "Prioritize",
       description:
         "Focus on the highest-impact opportunities across advertising, listings, operations, and profitability.",
-      media: "/images/prioritize-illustration.png",
+      media: "/images/prioritize-photo.jpg",
+      photo: true,
       icon: SlidersHorizontal,
       gradient: "linear-gradient(135deg, #1f5eff, #0b1f3a)",
     },
@@ -75,7 +77,7 @@ export default function OurProcess() {
         end: "+=" + pinDistance,
         pin: true,
         anticipatePin: 1,
-        scrub: true,
+        scrub: 0.5,
         onUpdate(self) {
           const idx = Math.round(self.progress * (STEP_COUNT - 1));
           setActiveIndex((prev) => (prev === idx ? prev : idx));
